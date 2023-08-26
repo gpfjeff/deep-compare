@@ -3,6 +3,7 @@ package com.gpfcomics.deepcompare.ui;
 import com.gpfcomics.deepcompare.Main;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URI;
@@ -98,6 +99,7 @@ public class AboutDialog extends JDialog {
     private void $$$setupUI$$$() {
         contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout(0, 0));
+        contentPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         contentPane.add(panel1, BorderLayout.SOUTH);
@@ -130,4 +132,5 @@ public class AboutDialog extends JDialog {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
+
 }

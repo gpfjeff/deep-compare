@@ -5,7 +5,9 @@
       <xy x="48" y="54" width="436" height="297"/>
     </constraints>
     <properties/>
-    <border type="none"/>
+    <border type="empty">
+      <size top="5" left="5" bottom="5" right="5"/>
+    </border>
     <children>
       <grid id="b01a7" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
         <constraints border-constraint="South"/>
