@@ -1,6 +1,7 @@
 package com.gpfcomics.deepcompare.core;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ public class File {
     private long size;
 
     @Getter
+    @Setter
     private boolean pathMatch = false;
 
     @Getter
@@ -66,6 +68,10 @@ public class File {
             // TODO: What to do if an exception is thrown?
             hash = null;
         }
+    }
+
+    public void compare(File companion) {
+        hashMatch = hash.equals(companion.getHash());
     }
 
 }
