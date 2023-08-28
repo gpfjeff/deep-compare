@@ -17,19 +17,19 @@
           <component id="8e643" class="javax.swing.JButton" binding="btnStart">
             <constraints/>
             <properties>
-              <text value="Start"/>
+              <text resource-bundle="MessagesBundle" key="start.start.button"/>
             </properties>
           </component>
           <component id="45cd7" class="javax.swing.JButton" binding="btnAbout">
             <constraints/>
             <properties>
-              <text value="About..."/>
+              <text resource-bundle="MessagesBundle" key="start.about.button"/>
             </properties>
           </component>
           <component id="815ef" class="javax.swing.JButton" binding="btnClose">
             <constraints/>
             <properties>
-              <text value="Close"/>
+              <text resource-bundle="MessagesBundle" key="start.close.button"/>
             </properties>
           </component>
         </children>
@@ -52,7 +52,7 @@
                   <component id="db5c1" class="javax.swing.JButton" binding="btnOptions">
                     <constraints/>
                     <properties>
-                      <text value="Comparison Options..."/>
+                      <text resource-bundle="MessagesBundle" key="start.comparison.options.button"/>
                     </properties>
                   </component>
                 </children>
@@ -72,7 +72,7 @@
                   <component id="855c8" class="javax.swing.JButton" binding="btnTargetBrowse">
                     <constraints border-constraint="East"/>
                     <properties>
-                      <label value="Browse..."/>
+                      <label resource-bundle="MessagesBundle" key="browse.button"/>
                       <text value="Browse..."/>
                     </properties>
                   </component>
@@ -95,7 +95,7 @@
                       <component id="cce73" class="javax.swing.JLabel">
                         <constraints border-constraint="West"/>
                         <properties>
-                          <text value="Target Folder:"/>
+                          <text resource-bundle="MessagesBundle" key="start.target.folder"/>
                         </properties>
                       </component>
                     </children>
@@ -113,7 +113,7 @@
                           <component id="f6746" class="javax.swing.JButton" binding="btnSourceBrowse">
                             <constraints border-constraint="East"/>
                             <properties>
-                              <label value="Browse..."/>
+                              <label resource-bundle="MessagesBundle" key="browse.button"/>
                               <text value="Browse..."/>
                             </properties>
                           </component>
@@ -137,7 +137,7 @@
                           <component id="ce6f6" class="javax.swing.JLabel">
                             <constraints border-constraint="West"/>
                             <properties>
-                              <text value="Source Folder:"/>
+                              <text resource-bundle="MessagesBundle" key="start.source.folder"/>
                             </properties>
                           </component>
                         </children>

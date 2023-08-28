@@ -1,17 +1,30 @@
 package com.gpfcomics.deepcompare.ui;
 
+import com.gpfcomics.deepcompare.Main;
 import com.gpfcomics.deepcompare.core.ComparisonOptions;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
+/**
+ * The Comparison Options dialog allows the user to fine-tune the folder comparison by excluding files based on
+ * patterns, to ignore hidden files, to change the hashing algorithm, and to determine where to store the log file, if
+ * any.  These options are sent back to the Start Window once the user clicks the OK button, or abandoned if they click
+ * the Cancel button.
+ */
 public class OptionsDialog extends JDialog {
+
+    // GUI elements, mostly added automagically by the GUI builder:
     private JPanel contentPane;
     private JButton btnOk;
     private JButton btnCancel;
@@ -35,7 +48,7 @@ public class OptionsDialog extends JDialog {
 
     public OptionsDialog(Frame owner, ComparisonOptions options) {
 
-        super(owner, "Comparison Options", true);
+        super(owner, Main.RESOURCES.getString("options.dialog.title"), true);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(btnOk);
@@ -93,7 +106,9 @@ public class OptionsDialog extends JDialog {
         btnAdd.addActionListener(e -> {
             // Prompt the user for a new exclusion pattern.  Note that we're not going to do any validation here to see
             // if the pattern is valid.  The comparison engine will simply ignore the pattern if it doesn't parse.
-            String newExclusion = JOptionPane.showInputDialog("Enter an exclusion pattern:");
+            String newExclusion = JOptionPane.showInputDialog(
+                    Main.RESOURCES.getString("options.exclusions.dialog.prompt")
+            );
             // If the string is non-empty:
             if (newExclusion != null && !newExclusion.trim().isEmpty()) {
                 // Get the current selection index.  If something is already selected, we'll insert the new item at
@@ -159,8 +174,8 @@ public class OptionsDialog extends JDialog {
         // space.)  Put the two options into the list, then select the appropriate item based on the value in the
         // options.
         comboRegex.setEditable(false);
-        comboRegex.addItem("Exclusions use DOS/UNIX wildcards");
-        comboRegex.addItem("Exclusions use regular expressions");
+        comboRegex.addItem(Main.RESOURCES.getString("options.exclusions.option.dos"));
+        comboRegex.addItem(Main.RESOURCES.getString("options.exclusions.option.regex"));
         comboRegex.setSelectedIndex(this.options.isExclusionsRegex() ? 1 : 0);
 
         // Build the hash algorithm drop-down.  Grab the list of available hashes from the options class and add them
@@ -193,6 +208,7 @@ public class OptionsDialog extends JDialog {
                                     !Files.exists(currentPathPath) ||
                                     !Files.isDirectory(currentPathPath)
                     ) {
+                        txtLogPath.setText("");
                         currentPath = System.getProperty("user.home");
                     }
                 } catch (Exception ex) {
@@ -201,15 +217,19 @@ public class OptionsDialog extends JDialog {
                 }
                 // Open the file chooser to the starting path and only let the user select directories:
                 JFileChooser chooser = new JFileChooser(currentPath);
-                chooser.setDialogTitle("Select Log Destination Directory");
+                chooser.setDialogTitle(Main.RESOURCES.getString("options.log.directory.prompt"));
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 // If the user selects a directory, update the log path text box:
                 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                     txtLogPath.setText(chooser.getSelectedFile().getAbsolutePath());
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error trying to find the " +
-                        "log destination path!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(
+                        null,
+                        Main.RESOURCES.getString("options.error.log.path.generic"),
+                        Main.RESOURCES.getString("dialog.title.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
         });
 
@@ -244,13 +264,21 @@ public class OptionsDialog extends JDialog {
             try {
                 Path logPathPath = Paths.get(logPath);
                 if (!Files.exists(logPathPath) || !Files.isDirectory(logPathPath)) {
-                    JOptionPane.showMessageDialog(null, "Log file path is not a valid directory!",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            Main.RESOURCES.getString("options.error.log.path.invalid"),
+                            Main.RESOURCES.getString("dialog.title.error"),
+                            JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Log file path is not a valid directory!",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(
+                        null,
+                        Main.RESOURCES.getString("options.error.log.path.invalid"),
+                        Main.RESOURCES.getString("dialog.title.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
                 return;
             }
         }
@@ -262,9 +290,15 @@ public class OptionsDialog extends JDialog {
                 try {
                     Pattern.compile(exclusionListModel.getElementAt(i));
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "The following exclusion pattern is not " +
-                                    "a valid regular expression: " + exclusionListModel.getElementAt(i),
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            String.format(
+                                    Main.RESOURCES.getString("options.error.invalid.regex"),
+                                    exclusionListModel.getElementAt(i)
+                            ),
+                            Main.RESOURCES.getString("dialog.title.error"),
+                            JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
             }
@@ -316,7 +350,7 @@ public class OptionsDialog extends JDialog {
         panel2.setLayout(new BorderLayout(0, 0));
         panel1.add(panel2, BorderLayout.SOUTH);
         checkDebug = new JCheckBox();
-        checkDebug.setText("Add debug messages to log file");
+        this.$$$loadButtonText$$$(checkDebug, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.debug.checkbox"));
         panel2.add(checkDebug, BorderLayout.CENTER);
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new BorderLayout(0, 0));
@@ -325,7 +359,7 @@ public class OptionsDialog extends JDialog {
         panel4.setLayout(new BorderLayout(0, 0));
         panel3.add(panel4, BorderLayout.SOUTH);
         btnLogBrowse = new JButton();
-        btnLogBrowse.setText("Browse...");
+        this.$$$loadButtonText$$$(btnLogBrowse, this.$$$getMessageFromBundle$$$("MessagesBundle", "browse.button"));
         panel4.add(btnLogBrowse, BorderLayout.EAST);
         txtLogPath = new JTextField();
         panel4.add(txtLogPath, BorderLayout.CENTER);
@@ -333,13 +367,13 @@ public class OptionsDialog extends JDialog {
         panel5.setLayout(new BorderLayout(0, 0));
         panel3.add(panel5, BorderLayout.CENTER);
         final JLabel label1 = new JLabel();
-        label1.setText("Log file path (leave blank for no log):");
+        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.log.file.label"));
         panel5.add(label1, BorderLayout.SOUTH);
         final JPanel panel6 = new JPanel();
         panel6.setLayout(new BorderLayout(0, 0));
         panel5.add(panel6, BorderLayout.CENTER);
         checkHidden = new JCheckBox();
-        checkHidden.setText("Compare hidden files");
+        this.$$$loadButtonText$$$(checkHidden, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.hidden.files.checkbox"));
         panel6.add(checkHidden, BorderLayout.SOUTH);
         final JPanel panel7 = new JPanel();
         panel7.setLayout(new BorderLayout(0, 0));
@@ -350,7 +384,7 @@ public class OptionsDialog extends JDialog {
         panel8.setLayout(new BorderLayout(0, 0));
         panel7.add(panel8, BorderLayout.CENTER);
         final JLabel label2 = new JLabel();
-        label2.setText("Hash algorithm for comparisons:");
+        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.hash.label"));
         panel8.add(label2, BorderLayout.SOUTH);
         final JPanel panel9 = new JPanel();
         panel9.setLayout(new BorderLayout(0, 0));
@@ -361,37 +395,114 @@ public class OptionsDialog extends JDialog {
         panel10.setLayout(new BorderLayout(0, 0));
         panel9.add(panel10, BorderLayout.CENTER);
         final JLabel label3 = new JLabel();
-        label3.setText("Exclusions:");
+        this.$$$loadLabelText$$$(label3, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.exclusions.label"));
         panel10.add(label3, BorderLayout.NORTH);
         final JPanel panel11 = new JPanel();
-        panel11.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        panel11.setLayout(new BorderLayout(0, 0));
         panel10.add(panel11, BorderLayout.EAST);
-        btnAdd = new JButton();
-        btnAdd.setText("Add...");
-        panel11.add(btnAdd);
-        btnRemove = new JButton();
-        btnRemove.setText("Remove");
-        panel11.add(btnRemove);
-        btnMoveUp = new JButton();
-        btnMoveUp.setText("Up");
-        panel11.add(btnMoveUp);
         btnMoveDown = new JButton();
-        btnMoveDown.setText("Down");
-        panel11.add(btnMoveDown);
+        this.$$$loadButtonText$$$(btnMoveDown, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.down.button"));
+        panel11.add(btnMoveDown, BorderLayout.SOUTH);
+        final JPanel panel12 = new JPanel();
+        panel12.setLayout(new BorderLayout(0, 0));
+        panel11.add(panel12, BorderLayout.NORTH);
+        btnMoveUp = new JButton();
+        this.$$$loadButtonText$$$(btnMoveUp, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.up.button"));
+        panel12.add(btnMoveUp, BorderLayout.SOUTH);
+        final JPanel panel13 = new JPanel();
+        panel13.setLayout(new BorderLayout(0, 0));
+        panel12.add(panel13, BorderLayout.CENTER);
+        btnRemove = new JButton();
+        this.$$$loadButtonText$$$(btnRemove, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.remove.button"));
+        panel13.add(btnRemove, BorderLayout.SOUTH);
+        btnAdd = new JButton();
+        this.$$$loadButtonText$$$(btnAdd, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.add.button"));
+        panel13.add(btnAdd, BorderLayout.NORTH);
         listExclusions = new JList();
         panel10.add(listExclusions, BorderLayout.CENTER);
-        final JPanel panel12 = new JPanel();
-        panel12.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        contentPane.add(panel12, BorderLayout.SOUTH);
-        final JPanel panel13 = new JPanel();
-        panel13.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        panel12.add(panel13);
+        final JPanel panel14 = new JPanel();
+        panel14.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        contentPane.add(panel14, BorderLayout.SOUTH);
+        final JPanel panel15 = new JPanel();
+        panel15.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        panel14.add(panel15);
         btnOk = new JButton();
         btnOk.setText("OK");
-        panel13.add(btnOk);
+        panel15.add(btnOk);
         btnCancel = new JButton();
-        btnCancel.setText("Cancel");
-        panel13.add(btnCancel);
+        this.$$$loadButtonText$$$(btnCancel, this.$$$getMessageFromBundle$$$("MessagesBundle", "cancel.button"));
+        panel15.add(btnCancel);
+    }
+
+    private static Method $$$cachedGetBundleMethod$$$ = null;
+
+    private String $$$getMessageFromBundle$$$(String path, String key) {
+        ResourceBundle bundle;
+        try {
+            Class<?> thisClass = this.getClass();
+            if ($$$cachedGetBundleMethod$$$ == null) {
+                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+            }
+            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+        } catch (Exception e) {
+            bundle = ResourceBundle.getBundle(path);
+        }
+        return bundle.getString(key);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadLabelText$$$(JLabel component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setDisplayedMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadButtonText$$$(AbstractButton component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
     }
 
     /**

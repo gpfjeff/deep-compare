@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.gpfcomics.deepcompare.ui.OptionsDialog">
   <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="48" y="54" width="436" height="297"/>
+      <xy x="48" y="54" width="443" height="375"/>
     </constraints>
     <properties/>
     <border type="empty">
@@ -22,7 +22,7 @@
               <component id="89358" class="javax.swing.JCheckBox" binding="checkDebug">
                 <constraints border-constraint="Center"/>
                 <properties>
-                  <text value="Add debug messages to log file"/>
+                  <text resource-bundle="MessagesBundle" key="options.debug.checkbox"/>
                 </properties>
               </component>
             </children>
@@ -40,7 +40,7 @@
                   <component id="c2b22" class="javax.swing.JButton" binding="btnLogBrowse">
                     <constraints border-constraint="East"/>
                     <properties>
-                      <text value="Browse..."/>
+                      <text resource-bundle="MessagesBundle" key="browse.button"/>
                     </properties>
                   </component>
                   <component id="fe361" class="javax.swing.JTextField" binding="txtLogPath">
@@ -57,7 +57,7 @@
                   <component id="1e3bc" class="javax.swing.JLabel">
                     <constraints border-constraint="South"/>
                     <properties>
-                      <text value="Log file path (leave blank for no log):"/>
+                      <text resource-bundle="MessagesBundle" key="options.log.file.label"/>
                     </properties>
                   </component>
                   <grid id="66350" layout-manager="BorderLayout" hgap="0" vgap="0">
@@ -68,7 +68,7 @@
                       <component id="6e53c" class="javax.swing.JCheckBox" binding="checkHidden">
                         <constraints border-constraint="South"/>
                         <properties>
-                          <text value="Compare hidden files"/>
+                          <text resource-bundle="MessagesBundle" key="options.hidden.files.checkbox"/>
                         </properties>
                       </component>
                       <grid id="23c1b" layout-manager="BorderLayout" hgap="0" vgap="0">
@@ -88,7 +88,7 @@
                               <component id="abf02" class="javax.swing.JLabel">
                                 <constraints border-constraint="South"/>
                                 <properties>
-                                  <text value="Hash algorithm for comparisons:"/>
+                                  <text resource-bundle="MessagesBundle" key="options.hash.label"/>
                                 </properties>
                               </component>
                               <grid id="3d1cf" layout-manager="BorderLayout" hgap="0" vgap="0">
@@ -108,38 +108,52 @@
                                       <component id="b7f47" class="javax.swing.JLabel">
                                         <constraints border-constraint="North"/>
                                         <properties>
-                                          <text value="Exclusions:"/>
+                                          <text resource-bundle="MessagesBundle" key="options.exclusions.label"/>
                                         </properties>
                                       </component>
-                                      <grid id="f3c49" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                                      <grid id="f3c49" layout-manager="BorderLayout" hgap="0" vgap="0">
                                         <constraints border-constraint="East"/>
                                         <properties/>
                                         <border type="none"/>
                                         <children>
-                                          <component id="30b5" class="javax.swing.JButton" binding="btnAdd">
-                                            <constraints/>
-                                            <properties>
-                                              <text value="Add..."/>
-                                            </properties>
-                                          </component>
-                                          <component id="aeda4" class="javax.swing.JButton" binding="btnRemove">
-                                            <constraints/>
-                                            <properties>
-                                              <text value="Remove"/>
-                                            </properties>
-                                          </component>
-                                          <component id="1ad38" class="javax.swing.JButton" binding="btnMoveUp">
-                                            <constraints/>
-                                            <properties>
-                                              <text value="Up"/>
-                                            </properties>
-                                          </component>
                                           <component id="9d58b" class="javax.swing.JButton" binding="btnMoveDown">
-                                            <constraints/>
+                                            <constraints border-constraint="South"/>
                                             <properties>
-                                              <text value="Down"/>
+                                              <text resource-bundle="MessagesBundle" key="options.down.button"/>
                                             </properties>
                                           </component>
+                                          <grid id="3c835" layout-manager="BorderLayout" hgap="0" vgap="0">
+                                            <constraints border-constraint="North"/>
+                                            <properties/>
+                                            <border type="none"/>
+                                            <children>
+                                              <component id="1ad38" class="javax.swing.JButton" binding="btnMoveUp">
+                                                <constraints border-constraint="South"/>
+                                                <properties>
+                                                  <text resource-bundle="MessagesBundle" key="options.up.button"/>
+                                                </properties>
+                                              </component>
+                                              <grid id="9bd3" layout-manager="BorderLayout" hgap="0" vgap="0">
+                                                <constraints border-constraint="Center"/>
+                                                <properties/>
+                                                <border type="none"/>
+                                                <children>
+                                                  <component id="aeda4" class="javax.swing.JButton" binding="btnRemove">
+                                                    <constraints border-constraint="South"/>
+                                                    <properties>
+                                                      <text resource-bundle="MessagesBundle" key="options.remove.button"/>
+                                                    </properties>
+                                                  </component>
+                                                  <component id="30b5" class="javax.swing.JButton" binding="btnAdd">
+                                                    <constraints border-constraint="North"/>
+                                                    <properties>
+                                                      <text resource-bundle="MessagesBundle" key="options.add.button"/>
+                                                    </properties>
+                                                  </component>
+                                                </children>
+                                              </grid>
+                                            </children>
+                                          </grid>
                                         </children>
                                       </grid>
                                       <component id="ac540" class="javax.swing.JList" binding="listExclusions">
@@ -181,7 +195,7 @@
               <component id="5723f" class="javax.swing.JButton" binding="btnCancel">
                 <constraints/>
                 <properties>
-                  <text value="Cancel"/>
+                  <text resource-bundle="MessagesBundle" key="cancel.button"/>
                 </properties>
               </component>
             </children>

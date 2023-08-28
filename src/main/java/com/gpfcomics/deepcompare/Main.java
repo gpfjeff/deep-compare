@@ -5,6 +5,8 @@ import com.gpfcomics.deepcompare.ui.StartWindow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Main application starting point.  This class controls whether we start in GUI or CLI mode, based on how the main
@@ -29,6 +31,22 @@ public class Main {
      * in various output modes.
      */
     public static final String WEBSITE_URL = "https://github.com/gpfjeff/deep-compare";
+
+    /**
+     * A ResourceBundle to support internationalization, where available.  If no localized messages can be found for the
+     * user's default locale, default to United States English.
+     */
+    public static final ResourceBundle RESOURCES;
+    static {
+        ResourceBundle temp;
+        try {
+            Locale locale = Locale.getDefault();
+            temp = ResourceBundle.getBundle("MessagesBundle", locale);
+        } catch (Exception ignored) {
+            temp = ResourceBundle.getBundle("MessagesBundle", Locale.US);
+        }
+        RESOURCES = temp;
+    }
 
     public static void main(String[] args) {
 

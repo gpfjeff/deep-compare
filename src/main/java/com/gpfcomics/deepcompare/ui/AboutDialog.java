@@ -6,7 +6,9 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ResourceBundle;
 
 public class AboutDialog extends JDialog {
     private JPanel contentPane;
@@ -36,8 +38,8 @@ public class AboutDialog extends JDialog {
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(
                             null,
-                            "Error launching Web browser!",
-                            "Error",
+                            Main.RESOURCES.getString("about.error.web.link"),
+                            Main.RESOURCES.getString("dialog.title.error"),
                             JOptionPane.ERROR_MESSAGE
                     );
                 }
@@ -104,7 +106,7 @@ public class AboutDialog extends JDialog {
         panel1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         contentPane.add(panel1, BorderLayout.SOUTH);
         btnOK = new JButton();
-        btnOK.setText("OK");
+        this.$$$loadButtonText$$$(btnOK, this.$$$getMessageFromBundle$$$("MessagesBundle", "ok.button"));
         panel1.add(btnOK);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new BorderLayout(0, 0));
@@ -124,6 +126,50 @@ public class AboutDialog extends JDialog {
         lblVersion.setHorizontalAlignment(0);
         lblVersion.setText("Version info goes here...");
         panel3.add(lblVersion, BorderLayout.NORTH);
+    }
+
+    private static Method $$$cachedGetBundleMethod$$$ = null;
+
+    private String $$$getMessageFromBundle$$$(String path, String key) {
+        ResourceBundle bundle;
+        try {
+            Class<?> thisClass = this.getClass();
+            if ($$$cachedGetBundleMethod$$$ == null) {
+                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+            }
+            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+        } catch (Exception e) {
+            bundle = ResourceBundle.getBundle(path);
+        }
+        return bundle.getString(key);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadButtonText$$$(AbstractButton component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
     }
 
     /**

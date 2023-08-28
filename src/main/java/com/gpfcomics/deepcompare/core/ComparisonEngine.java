@@ -24,9 +24,9 @@ public class ComparisonEngine implements Runnable {
     @Getter
     private long totalBytes;
 
-    private IHashProgressListener hashListener;
+    private final IHashProgressListener hashListener;
 
-    private IStatusListener statusListener;
+    private final IStatusListener statusListener;
 
     public ComparisonEngine(String sourcePath, String targetPath, ComparisonOptions options,
                             IHashProgressListener hashListener, IStatusListener statusListener) {
@@ -58,8 +58,7 @@ public class ComparisonEngine implements Runnable {
             sourceDirectory.hash(hash, hashListener);
             statusListener.updateStatusMessage("Generating final report...");
         } catch (Exception ex) {
-            statusListener.errorMessage("");
-
+            statusListener.errorMessage("Error generated while processing");
         }
 
     }

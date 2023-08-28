@@ -1,14 +1,17 @@
 package com.gpfcomics.deepcompare.ui;
 
+import com.gpfcomics.deepcompare.Main;
 import com.gpfcomics.deepcompare.core.ComparisonOptions;
 import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ResourceBundle;
 
 /**
  * The main start window for the GUI app.  This exposes the main parameters and gives the user a chance to set
@@ -41,11 +44,11 @@ public class StartWindow {
 
         // The source and target Browse buttons will allow the user to select these folders graphically:
         btnSourceBrowse.addActionListener(e -> {
-            browseForPath("Source", txtSource);
+            browseForPath(Main.RESOURCES.getString("source.label"), txtSource);
         });
 
         btnTargetBrowse.addActionListener(e -> {
-            browseForPath("Target", txtTarget);
+            browseForPath(Main.RESOURCES.getString("target.label"), txtTarget);
         });
 
         // The Comparison Options button launches the options dialog, which lets the user fine tune the comparison:
@@ -83,8 +86,12 @@ public class StartWindow {
                                 !Files.exists(sourcePath) ||
                                 !Files.isDirectory(sourcePath)
                 ) {
-                    JOptionPane.showMessageDialog(null, "Source path is not a valid directory!",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            Main.RESOURCES.getString("start.error.invalid.source.path"),
+                            Main.RESOURCES.getString("dialog.title.error"),
+                            JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
                 if (
@@ -92,16 +99,24 @@ public class StartWindow {
                                 !Files.exists(targetPath) ||
                                 !Files.isDirectory(targetPath)
                 ) {
-                    JOptionPane.showMessageDialog(null, "Target path is not a valid directory!",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            Main.RESOURCES.getString("start.error.invalid.target.path"),
+                            Main.RESOURCES.getString("dialog.title.error"),
+                            JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
                 // If the source and target paths are equal or one is contained inside the other, abort:
                 if (sourceString.equals(targetString) ||
                         sourcePath.startsWith(targetString) ||
                         targetPath.startsWith(sourceString)) {
-                    JOptionPane.showMessageDialog(null, "Portions of the source and target " +
-                            "paths refer to the same path!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            Main.RESOURCES.getString("start.error.source.target.same.path"),
+                            Main.RESOURCES.getString("dialog.title.error"),
+                            JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
                 // The Options dialog will take care of most of the option validation for us, but there is one thing
@@ -110,21 +125,31 @@ public class StartWindow {
                 if (options.getLogFilePath() != null &&
                         (Paths.get(options.getLogFilePath()).startsWith(sourceString) ||
                                 Paths.get(options.getLogFilePath()).startsWith(targetString))) {
-                    JOptionPane.showMessageDialog(null, "The log file cannot be written to " +
-                            "either the source or target paths!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            null,
+                            Main.RESOURCES.getString("start.error.log.file.in.path"),
+                            Main.RESOURCES.getString("dialog.title.error"),
+                            JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
                 // If the exclusions are not currently using regular expressions, convert them now.  Note that this is
                 // is a one-way conversion, so from this point on we won't let the user edit it.
-                if (!options.isExclusionsRegex()) { options.convertSimpleWildcardsToRegex(); }
+                if (!options.isExclusionsRegex()) {
+                    options.convertSimpleWildcardsToRegex();
+                }
                 // At this point, we should be good to go.  Pass our parameters to the core comparison engine and
                 // put it to work:
                 // TODO: Obviously, we haven't gotten that far yet...
                 JOptionPane.showMessageDialog(null,
                         "Everything looks good! Here's where the fun begins...");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error validating inputs!", "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(
+                        null,
+                        Main.RESOURCES.getString("start.error.generic"),
+                        Main.RESOURCES.getString("dialog.title.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
         });
 
@@ -132,7 +157,8 @@ public class StartWindow {
 
     /**
      * Allow the user to select the source or target folder via the system file selection dialog
-     * @param label A String containing the type of folder we're searching for (source or target)
+     *
+     * @param label       A String containing the type of folder we're searching for (source or target)
      * @param targetField The JTextField containing the currently selected path, if any.  The user's selection will be
      *                    added to this box.
      */
@@ -147,8 +173,8 @@ public class StartWindow {
             try {
                 if (
                         pathString.isEmpty() ||
-                        !Files.exists(startPath) ||
-                        !Files.isDirectory(startPath)
+                                !Files.exists(startPath) ||
+                                !Files.isDirectory(startPath)
                 ) {
                     targetField.setText("");
                     pathString = System.getProperty("user.home");
@@ -160,7 +186,12 @@ public class StartWindow {
             // Open the file choose and configure it.  We'll start at the selected path above and restrict the user to
             // only choosing directories:
             JFileChooser chooser = new JFileChooser(pathString);
-            chooser.setDialogTitle("Select " + label + " Folder");
+            chooser.setDialogTitle(
+                    String.format(
+                            Main.RESOURCES.getString("start.browse.file.chooser.title"),
+                            label
+                    )
+            );
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             // If the user selects a valid path (which we'll assume the file chooser will validate), set the test field
             // to the absolute path of the selected directory:
@@ -171,8 +202,11 @@ public class StartWindow {
             // TODO: Catch explicit exceptions to make more useful error messages
             JOptionPane.showMessageDialog(
                     null,
-                    "Error trying to find the " + label.toLowerCase() + " path!",
-                    "Error",
+                    String.format(
+                            Main.RESOURCES.getString("start.browse.generic.error"),
+                            label
+                    ),
+                    Main.RESOURCES.getString("dialog.title.error"),
                     JOptionPane.ERROR_MESSAGE
             );
         }
@@ -203,13 +237,13 @@ public class StartWindow {
         panel1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         rootPanel.add(panel1, BorderLayout.SOUTH);
         btnStart = new JButton();
-        btnStart.setText("Start");
+        this.$$$loadButtonText$$$(btnStart, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.start.button"));
         panel1.add(btnStart);
         btnAbout = new JButton();
-        btnAbout.setText("About...");
+        this.$$$loadButtonText$$$(btnAbout, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.about.button"));
         panel1.add(btnAbout);
         btnClose = new JButton();
-        btnClose.setText("Close");
+        this.$$$loadButtonText$$$(btnClose, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.close.button"));
         panel1.add(btnClose);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new BorderLayout(0, 0));
@@ -221,7 +255,7 @@ public class StartWindow {
         panel4.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         panel3.add(panel4, BorderLayout.CENTER);
         btnOptions = new JButton();
-        btnOptions.setText("Comparison Options...");
+        this.$$$loadButtonText$$$(btnOptions, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.comparison.options.button"));
         panel4.add(btnOptions);
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new BorderLayout(0, 0));
@@ -230,7 +264,7 @@ public class StartWindow {
         panel6.setLayout(new BorderLayout(0, 0));
         panel5.add(panel6, BorderLayout.SOUTH);
         btnTargetBrowse = new JButton();
-        btnTargetBrowse.setLabel("Browse...");
+        btnTargetBrowse.setLabel(this.$$$getMessageFromBundle$$$("MessagesBundle", "browse.button"));
         btnTargetBrowse.setText("Browse...");
         panel6.add(btnTargetBrowse, BorderLayout.EAST);
         txtTarget = new JTextField();
@@ -242,7 +276,7 @@ public class StartWindow {
         panel8.setLayout(new BorderLayout(0, 0));
         panel7.add(panel8, BorderLayout.SOUTH);
         final JLabel label1 = new JLabel();
-        label1.setText("Target Folder:");
+        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.target.folder"));
         panel8.add(label1, BorderLayout.WEST);
         final JPanel panel9 = new JPanel();
         panel9.setLayout(new BorderLayout(0, 0));
@@ -251,7 +285,7 @@ public class StartWindow {
         panel10.setLayout(new BorderLayout(0, 0));
         panel9.add(panel10, BorderLayout.SOUTH);
         btnSourceBrowse = new JButton();
-        btnSourceBrowse.setLabel("Browse...");
+        btnSourceBrowse.setLabel(this.$$$getMessageFromBundle$$$("MessagesBundle", "browse.button"));
         btnSourceBrowse.setText("Browse...");
         panel10.add(btnSourceBrowse, BorderLayout.EAST);
         txtSource = new JTextField();
@@ -263,8 +297,79 @@ public class StartWindow {
         panel12.setLayout(new BorderLayout(0, 0));
         panel11.add(panel12, BorderLayout.SOUTH);
         final JLabel label2 = new JLabel();
-        label2.setText("Source Folder:");
+        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.source.folder"));
         panel11.add(label2, BorderLayout.WEST);
+    }
+
+    private static Method $$$cachedGetBundleMethod$$$ = null;
+
+    private String $$$getMessageFromBundle$$$(String path, String key) {
+        ResourceBundle bundle;
+        try {
+            Class<?> thisClass = this.getClass();
+            if ($$$cachedGetBundleMethod$$$ == null) {
+                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+            }
+            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+        } catch (Exception e) {
+            bundle = ResourceBundle.getBundle(path);
+        }
+        return bundle.getString(key);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadLabelText$$$(JLabel component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setDisplayedMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadButtonText$$$(AbstractButton component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
     }
 
     /**

@@ -17,7 +17,7 @@
           <component id="13e09" class="javax.swing.JButton" binding="btnOK">
             <constraints/>
             <properties>
-              <text value="OK"/>
+              <text resource-bundle="MessagesBundle" key="ok.button"/>
             </properties>
           </component>
         </children>
