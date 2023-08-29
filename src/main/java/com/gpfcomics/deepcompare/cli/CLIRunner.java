@@ -50,6 +50,8 @@ public class CLIRunner {
         System.out.println("Deep Compare v" + Main.VERSION);
         System.out.println("Copyright " + Main.COPYRIGHT_YEAR + ", Jeffrey T. Darlington");
         System.out.println(Main.WEBSITE_URL);
+        String translator = Main.RESOURCES.getString("about.translation.attribution");
+        if (!translator.isEmpty()) System.out.println(translator);
         System.out.println();
         // Check the command-line arguments.  If none were provided, print the use message and exit:
         if (args == null || args.length == 0) {
@@ -82,6 +84,7 @@ public class CLIRunner {
      * Print the usage text to the console.
      */
     private void printUsage() {
+        // TODO: How do we move this wall of text into the MessagesBundle?
         System.out.println("USAGE:");
                           // Assuming 80 characters output:
                           //12345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -139,7 +142,12 @@ public class CLIRunner {
             if (arg == null || arg.trim().isEmpty()) continue;
             // If the argument doesn't start with two dashes, it's invalid.  Add an error and skip processing it:
             if (!arg.startsWith("--")) {
-                errors.add("Unrecognized parameter \"" + arg + "\"");
+                errors.add(
+                        String.format(
+                                Main.RESOURCES.getString("cli.error.unrecognized.parameter"),
+                                arg
+                        )
+                );
                 continue;
             }
             // Strip the two dashes from the start of the argument string and split it on the first equals sign.  We
@@ -264,7 +272,12 @@ public class CLIRunner {
                     break;
                 // If we get anything else, tell the use we don't recognize the parameter:
                 default:
-                    errors.add("Unrecognized parameter \"" + argParts[0] + "\"");
+                    errors.add(
+                            String.format(
+                                    Main.RESOURCES.getString("cli.error.unrecognized.parameter"),
+                                    argParts[0]
+                            )
+                    );
             }
         }
         // By this point, we should have pulled out our required parameters.  If we couldn't find them, explicitly print

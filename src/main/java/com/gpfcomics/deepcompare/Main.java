@@ -1,7 +1,7 @@
 package com.gpfcomics.deepcompare;
 
 import com.gpfcomics.deepcompare.cli.CLIRunner;
-import com.gpfcomics.deepcompare.ui.StartWindow;
+import com.gpfcomics.deepcompare.gui.StartWindow;
 
 import javax.swing.*;
 import java.awt.*;

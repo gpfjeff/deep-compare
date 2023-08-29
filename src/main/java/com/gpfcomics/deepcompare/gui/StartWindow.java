@@ -1,4 +1,4 @@
-package com.gpfcomics.deepcompare.ui;
+package com.gpfcomics.deepcompare.gui;
 
 import com.gpfcomics.deepcompare.Main;
 import com.gpfcomics.deepcompare.core.ComparisonOptions;
@@ -236,6 +236,7 @@ public class StartWindow {
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         rootPanel.add(panel1, BorderLayout.SOUTH);
+        panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         btnStart = new JButton();
         this.$$$loadButtonText$$$(btnStart, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.start.button"));
         panel1.add(btnStart);
@@ -248,9 +249,11 @@ public class StartWindow {
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new BorderLayout(0, 0));
         rootPanel.add(panel2, BorderLayout.CENTER);
+        panel2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new BorderLayout(0, 0));
         panel2.add(panel3, BorderLayout.SOUTH);
+        panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         panel3.add(panel4, BorderLayout.CENTER);
@@ -263,6 +266,7 @@ public class StartWindow {
         final JPanel panel6 = new JPanel();
         panel6.setLayout(new BorderLayout(0, 0));
         panel5.add(panel6, BorderLayout.SOUTH);
+        panel6.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         btnTargetBrowse = new JButton();
         btnTargetBrowse.setLabel(this.$$$getMessageFromBundle$$$("MessagesBundle", "browse.button"));
         btnTargetBrowse.setText("Browse...");
@@ -275,6 +279,7 @@ public class StartWindow {
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new BorderLayout(0, 0));
         panel7.add(panel8, BorderLayout.SOUTH);
+        panel8.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         final JLabel label1 = new JLabel();
         this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.target.folder"));
         panel8.add(label1, BorderLayout.WEST);
@@ -284,6 +289,7 @@ public class StartWindow {
         final JPanel panel10 = new JPanel();
         panel10.setLayout(new BorderLayout(0, 0));
         panel9.add(panel10, BorderLayout.SOUTH);
+        panel10.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         btnSourceBrowse = new JButton();
         btnSourceBrowse.setLabel(this.$$$getMessageFromBundle$$$("MessagesBundle", "browse.button"));
         btnSourceBrowse.setText("Browse...");
@@ -298,7 +304,7 @@ public class StartWindow {
         panel11.add(panel12, BorderLayout.SOUTH);
         final JLabel label2 = new JLabel();
         this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("MessagesBundle", "start.source.folder"));
-        panel11.add(label2, BorderLayout.WEST);
+        panel12.add(label2, BorderLayout.SOUTH);
     }
 
     private static Method $$$cachedGetBundleMethod$$$ = null;

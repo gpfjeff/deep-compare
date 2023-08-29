@@ -1,4 +1,4 @@
-package com.gpfcomics.deepcompare.ui;
+package com.gpfcomics.deepcompare.gui;
 
 import com.gpfcomics.deepcompare.Main;
 
@@ -11,11 +11,16 @@ import java.net.URI;
 import java.util.ResourceBundle;
 
 public class AboutDialog extends JDialog {
+
+    // GUI elements, mostly added automagically by the GUI builder.  The translator attribution label will be sourced
+    // from the message bundle, giving the translator attribution for their work.  (This will be blank for the English
+    // version which is my original specification.)
     private JPanel contentPane;
     private JButton btnOK;
     private JLabel lblVersion;
     private JLabel lblHyperlink;
     private JLabel lblCopyright;
+    private JLabel lblTranslator;
 
     public AboutDialog(Frame owner) {
 
@@ -25,9 +30,11 @@ public class AboutDialog extends JDialog {
         setModal(true);
         getRootPane().setDefaultButton(btnOK);
 
+        // Hard-code the version and copyright labels with the constants from the Main class:
         lblVersion.setText("Deep Compare v" + Main.VERSION);
         lblCopyright.setText("Copyright " + Main.COPYRIGHT_YEAR + ", Jeffrey T. Darlington.");
 
+        // Hard-code the hyperlink and make it clickable:
         lblHyperlink.setText(Main.WEBSITE_URL);
         lblHyperlink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         lblHyperlink.addMouseListener(new MouseListener() {
@@ -105,27 +112,45 @@ public class AboutDialog extends JDialog {
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         contentPane.add(panel1, BorderLayout.SOUTH);
+        panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         btnOK = new JButton();
         this.$$$loadButtonText$$$(btnOK, this.$$$getMessageFromBundle$$$("MessagesBundle", "ok.button"));
         panel1.add(btnOK);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new BorderLayout(0, 0));
         contentPane.add(panel2, BorderLayout.CENTER);
-        lblHyperlink = new JLabel();
-        lblHyperlink.setHorizontalAlignment(0);
-        lblHyperlink.setText("URL goes here...");
-        panel2.add(lblHyperlink, BorderLayout.SOUTH);
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new BorderLayout(0, 0));
         panel2.add(panel3, BorderLayout.CENTER);
+        panel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+        lblTranslator = new JLabel();
+        lblTranslator.setHorizontalAlignment(0);
+        this.$$$loadLabelText$$$(lblTranslator, this.$$$getMessageFromBundle$$$("MessagesBundle", "about.translation.attribution"));
+        panel3.add(lblTranslator, BorderLayout.SOUTH);
+        final JPanel panel4 = new JPanel();
+        panel4.setLayout(new BorderLayout(0, 0));
+        panel3.add(panel4, BorderLayout.CENTER);
+        panel4.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+        lblHyperlink = new JLabel();
+        lblHyperlink.setHorizontalAlignment(0);
+        lblHyperlink.setText("URL goes here...");
+        panel4.add(lblHyperlink, BorderLayout.SOUTH);
+        final JPanel panel5 = new JPanel();
+        panel5.setLayout(new BorderLayout(0, 0));
+        panel4.add(panel5, BorderLayout.CENTER);
+        panel5.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         lblCopyright = new JLabel();
         lblCopyright.setHorizontalAlignment(0);
         lblCopyright.setText("Copyright goes here...");
-        panel3.add(lblCopyright, BorderLayout.SOUTH);
+        panel5.add(lblCopyright, BorderLayout.SOUTH);
+        final JPanel panel6 = new JPanel();
+        panel6.setLayout(new BorderLayout(0, 0));
+        panel5.add(panel6, BorderLayout.CENTER);
+        panel6.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         lblVersion = new JLabel();
         lblVersion.setHorizontalAlignment(0);
         lblVersion.setText("Version info goes here...");
-        panel3.add(lblVersion, BorderLayout.NORTH);
+        panel6.add(lblVersion, BorderLayout.SOUTH);
     }
 
     private static Method $$$cachedGetBundleMethod$$$ = null;
@@ -143,6 +168,33 @@ public class AboutDialog extends JDialog {
             bundle = ResourceBundle.getBundle(path);
         }
         return bundle.getString(key);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadLabelText$$$(JLabel component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setDisplayedMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
     }
 
     /**

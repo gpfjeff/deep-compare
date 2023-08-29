@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.gpfcomics.deepcompare.ui.OptionsDialog">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.gpfcomics.deepcompare.gui.OptionsDialog">
   <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="48" y="54" width="443" height="375"/>
+      <xy x="48" y="54" width="443" height="515"/>
     </constraints>
     <properties/>
     <border type="empty">
@@ -12,12 +12,16 @@
       <grid id="e3588" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints border-constraint="Center"/>
         <properties/>
-        <border type="none"/>
+        <border type="empty">
+          <size top="5" left="5" bottom="0" right="5"/>
+        </border>
         <children>
           <grid id="c93e3" layout-manager="BorderLayout" hgap="0" vgap="0">
             <constraints border-constraint="South"/>
             <properties/>
-            <border type="none"/>
+            <border type="empty">
+              <size top="5" left="0" bottom="0" right="0"/>
+            </border>
             <children>
               <component id="89358" class="javax.swing.JCheckBox" binding="checkDebug">
                 <constraints border-constraint="Center"/>
@@ -30,7 +34,9 @@
           <grid id="20c78" layout-manager="BorderLayout" hgap="0" vgap="0">
             <constraints border-constraint="Center"/>
             <properties/>
-            <border type="none"/>
+            <border type="empty">
+              <size top="0" left="0" bottom="5" right="0"/>
+            </border>
             <children>
               <grid id="fd5b7" layout-manager="BorderLayout" hgap="0" vgap="0">
                 <constraints border-constraint="South"/>
@@ -52,7 +58,9 @@
               <grid id="d8ec5" layout-manager="BorderLayout" hgap="0" vgap="0">
                 <constraints border-constraint="Center"/>
                 <properties/>
-                <border type="none"/>
+                <border type="empty">
+                  <size top="0" left="0" bottom="5" right="0"/>
+                </border>
                 <children>
                   <component id="1e3bc" class="javax.swing.JLabel">
                     <constraints border-constraint="South"/>
@@ -63,7 +71,9 @@
                   <grid id="66350" layout-manager="BorderLayout" hgap="0" vgap="0">
                     <constraints border-constraint="Center"/>
                     <properties/>
-                    <border type="none"/>
+                    <border type="empty">
+                      <size top="0" left="0" bottom="5" right="0"/>
+                    </border>
                     <children>
                       <component id="6e53c" class="javax.swing.JCheckBox" binding="checkHidden">
                         <constraints border-constraint="South"/>
@@ -74,7 +84,9 @@
                       <grid id="23c1b" layout-manager="BorderLayout" hgap="0" vgap="0">
                         <constraints border-constraint="Center"/>
                         <properties/>
-                        <border type="none"/>
+                        <border type="empty">
+                          <size top="0" left="0" bottom="5" right="0"/>
+                        </border>
                         <children>
                           <component id="6bbd8" class="javax.swing.JComboBox" binding="comboHash">
                             <constraints border-constraint="South"/>
@@ -83,7 +95,9 @@
                           <grid id="88bda" layout-manager="BorderLayout" hgap="0" vgap="0">
                             <constraints border-constraint="Center"/>
                             <properties/>
-                            <border type="none"/>
+                            <border type="empty">
+                              <size top="0" left="0" bottom="5" right="0"/>
+                            </border>
                             <children>
                               <component id="abf02" class="javax.swing.JLabel">
                                 <constraints border-constraint="South"/>
@@ -94,7 +108,9 @@
                               <grid id="3d1cf" layout-manager="BorderLayout" hgap="0" vgap="0">
                                 <constraints border-constraint="Center"/>
                                 <properties/>
-                                <border type="none"/>
+                                <border type="empty">
+                                  <size top="0" left="0" bottom="5" right="0"/>
+                                </border>
                                 <children>
                                   <component id="6d72e" class="javax.swing.JComboBox" binding="comboRegex">
                                     <constraints border-constraint="South"/>
@@ -103,7 +119,9 @@
                                   <grid id="8fa69" layout-manager="BorderLayout" hgap="0" vgap="0">
                                     <constraints border-constraint="Center"/>
                                     <properties/>
-                                    <border type="none"/>
+                                    <border type="empty">
+                                      <size top="0" left="0" bottom="5" right="0"/>
+                                    </border>
                                     <children>
                                       <component id="b7f47" class="javax.swing.JLabel">
                                         <constraints border-constraint="North"/>
@@ -114,7 +132,9 @@
                                       <grid id="f3c49" layout-manager="BorderLayout" hgap="0" vgap="0">
                                         <constraints border-constraint="East"/>
                                         <properties/>
-                                        <border type="none"/>
+                                        <border type="empty">
+                                          <size top="5" left="5" bottom="5" right="5"/>
+                                        </border>
                                         <children>
                                           <component id="9d58b" class="javax.swing.JButton" binding="btnMoveDown">
                                             <constraints border-constraint="South"/>
@@ -125,7 +145,9 @@
                                           <grid id="3c835" layout-manager="BorderLayout" hgap="0" vgap="0">
                                             <constraints border-constraint="North"/>
                                             <properties/>
-                                            <border type="none"/>
+                                            <border type="empty">
+                                              <size top="5" left="0" bottom="0" right="0"/>
+                                            </border>
                                             <children>
                                               <component id="1ad38" class="javax.swing.JButton" binding="btnMoveUp">
                                                 <constraints border-constraint="South"/>
@@ -136,7 +158,9 @@
                                               <grid id="9bd3" layout-manager="BorderLayout" hgap="0" vgap="0">
                                                 <constraints border-constraint="Center"/>
                                                 <properties/>
-                                                <border type="none"/>
+                                                <border type="empty">
+                                                  <size top="5" left="0" bottom="0" right="0"/>
+                                                </border>
                                                 <children>
                                                   <component id="aeda4" class="javax.swing.JButton" binding="btnRemove">
                                                     <constraints border-constraint="South"/>
@@ -179,12 +203,16 @@
       <grid id="94766" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
         <constraints border-constraint="South"/>
         <properties/>
-        <border type="none"/>
+        <border type="empty">
+          <size top="5" left="5" bottom="5" right="5"/>
+        </border>
         <children>
           <grid id="9538f" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
             <constraints/>
             <properties/>
-            <border type="none"/>
+            <border type="empty">
+              <size top="5" left="5" bottom="5" right="5"/>
+            </border>
             <children>
               <component id="e7465" class="javax.swing.JButton" binding="btnOk">
                 <constraints/>

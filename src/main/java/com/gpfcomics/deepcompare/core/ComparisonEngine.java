@@ -30,8 +30,13 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
 
     private final IStatusListener statusListener;
 
-    public ComparisonEngine(String sourcePath, String targetPath, ComparisonOptions options,
-                            IHashProgressListener hashListener, IStatusListener statusListener) {
+    public ComparisonEngine(
+            String sourcePath,
+            String targetPath,
+            ComparisonOptions options,
+            IHashProgressListener hashListener,
+            IStatusListener statusListener
+    ) {
         this.sourcePath = sourcePath;
         this.targetPath = targetPath;
         this.options = options;
@@ -68,11 +73,26 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 // Write our preamble, with a header that includes the start time and the source and target directories:
                 log.write("Deep Compare v" + Main.VERSION);
                 log.newLine();
-                log.write("Begin comparison at " + (new Date()));
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.being.comparison"),
+                                new Date()
+                        )
+                );
                 log.newLine();
-                log.write("Source directory: " + sourcePath);
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.source.directory"),
+                                sourcePath
+                        )
+                );
                 log.newLine();
-                log.write("Target directory: " + targetPath);
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.target.directory"),
+                                targetPath
+                        )
+                );
                 log.newLine();
 
                 // If we're in debug mode, dump a bunch of extra input information:
@@ -113,9 +133,19 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
             statusListener.updateTotalFiles(totalFiles);
             statusListener.updateTotalBytes(totalBytes);
             if (log != null) {
-                log.write("Total number of files discovered: " + totalFiles);
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.files.discovered"),
+                                totalFiles
+                        )
+                );
                 log.newLine();
-                log.write("Total file size to process: " + Utilities.prettyPrintFileSize(totalBytes));
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.bytes.discovered"),
+                                totalBytes
+                        )
+                );
                 log.newLine();
             }
 
@@ -157,10 +187,10 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
         // If anything blows up, catch the exception and write the exception to the log, if we're writing one.  Note
         // that this ignores the debug flag; we will *ALWAYS* log the exception here.
         } catch (Exception ex) {
-            statusListener.errorMessage("Error generated while performing comparison");
+            statusListener.errorMessage(Main.RESOURCES.getString("engine.error.generic"));
             if (log != null) {
                 try {
-                    log.write("Error generated while performing comparison:");
+                    log.write(Main.RESOURCES.getString("engine.error.generic"));
                     log.newLine();
                     log.write(ex.toString());
                     log.newLine();
@@ -172,12 +202,17 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
         } finally {
             if (log != null) {
                 try {
-                    log.write("End comparison at " + (new Date()));
+                    log.write(
+                            String.format(
+                                    Main.RESOURCES.getString("engine.log.end.comparison"),
+                                    new Date()
+                            )
+                    );
                     log.newLine();
                     log.flush();
                     log.close();
                 } catch (IOException ignored) {
-                    statusListener.errorMessage("Error generated while performing comparison");
+                    statusListener.errorMessage(Main.RESOURCES.getString("engine.error.generic"));
                 }
             }
         }
