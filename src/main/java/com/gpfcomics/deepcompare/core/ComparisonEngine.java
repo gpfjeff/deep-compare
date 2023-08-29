@@ -136,10 +136,23 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
             }
             sourceDirectory.hash(hash, hashListener);
 
-            // Generate the final report:
+            // Generate the final report.  Tell the source folder to compare itself against the target folder and vice
+            // versa.  This has to be done from both sides, because a file may be missing from one tree and not the
+            // other, and that's the best way to identify this.
+            // TODO: One efficiency shortcut might be to skip comparing two files' hashes if we've already compared them
+            //       (i.e., skip target to source if we've already checked source to target).  Then again, this is just
+            //       a simple string compare at this point, so this might not buy us much.
             statusListener.updateStatusMessage(Main.RESOURCES.getString("engine.status.generate.report"));
             sourceDirectory.compare(targetDirectory);
             targetDirectory.compare(sourceDirectory);
+
+            // Log our results to the log file.  For CLI mode, this is our only useful output, while for GUI mode its
+            // an added bonus.  For the log file, we'll only be concerned with logging discrepancies; we don't need an
+            // exhaustive list of all files.  If the two folders match, a simple message stating that they match will
+            // suffice.
+            if (log != null) {
+                // TODO: Write results to log file
+            }
 
         // If anything blows up, catch the exception and write the exception to the log, if we're writing one.  Note
         // that this ignores the debug flag; we will *ALWAYS* log the exception here.

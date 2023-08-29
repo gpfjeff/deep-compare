@@ -163,27 +163,48 @@ public class Directory {
         }
     }
 
+    /**
+     * Compare this directory with its companion directory in the opposite tree
+     * @param companion The companion Directory
+     */
     public void compare(Directory companion) {
+        // We'll be optimistic and assume for now that the two directories match.  If this proves false, we'll flip
+        // this bit.
         match = true;
+        // Loop through our own files:
         for (File file : files) {
+            // Try to find the companion file in the opposite tree with the same name as this file.  If we fail to find
+            // the file, this will return null.
             File companionFile = companion.getFiles().stream()
                     .filter(f -> f.getSimpleName().equals(file.getSimpleName()))
                     .findFirst().orElse(null);
+            // If we find the companion file, mark our path as a match, then compare the two file hashes.  This will
+            // set our file's hash match flag.  If the hashes do not match, that means our directories don't match
+            // either.
             if (companionFile != null) {
                 file.setPathMatch(true);
                 file.compare(companionFile);
+                if (!file.isHashMatch()) match = false;
             } else {
+                // If we couldn't find the companion file, the path doesn't match.  That also means the directories
+                // don't match.
                 file.setPathMatch(false);
                 match = false;
             }
         }
+        // Now loop through our subdirectories:
         for (Directory dir : subdirectories) {
+            // Just as above, look for the subdirectory in the companion folder that matches this directory's name:
             Directory companionDir = companion.getSubdirectories().stream()
                     .filter(d -> d.getSimpleName().equals(dir.getSimpleName()))
                     .findFirst().orElse(null);
+            // If we found the same subfolder, run it through the same comparison process we did here, then compare its
+            // flag.  If they don't match, we don't match.
             if (companionDir != null) {
                 dir.compare(companionDir);
+                if (!dir.isMatch()) match = false;
             } else {
+                // We didn't find the subfolder, so we don't match:
                 dir.setMatch(false);
                 match = false;
             }
