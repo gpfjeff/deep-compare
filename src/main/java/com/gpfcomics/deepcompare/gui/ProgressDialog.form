@@ -12,7 +12,9 @@
       <grid id="e3588" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints border-constraint="Center"/>
         <properties/>
-        <border type="none"/>
+        <border type="empty">
+          <size top="5" left="5" bottom="5" right="5"/>
+        </border>
         <children>
           <component id="1972b" class="javax.swing.JLabel" binding="lblStatus">
             <constraints border-constraint="North"/>

@@ -67,7 +67,8 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 // location:
                 log = Files.newBufferedWriter(
                         Paths.get(options.getLogFilePath(), "deep-compare.log").toAbsolutePath(),
-                        StandardOpenOption.TRUNCATE_EXISTING
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.WRITE
                 );
 
                 // Write our preamble, with a header that includes the start time and the source and target directories:
@@ -143,7 +144,7 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 log.write(
                         String.format(
                                 Main.RESOURCES.getString("engine.log.bytes.discovered"),
-                                totalBytes
+                                Utilities.prettyPrintFileSize(totalBytes)
                         )
                 );
                 log.newLine();
