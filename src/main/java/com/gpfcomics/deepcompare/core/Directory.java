@@ -1,9 +1,11 @@
 package com.gpfcomics.deepcompare.core;
 
+import com.gpfcomics.deepcompare.Main;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -208,6 +210,20 @@ public class Directory {
                 dir.setMatch(false);
                 match = false;
             }
+        }
+    }
+
+    /**
+     * Recursively log discrepancies to the specified log file
+     * @param log An open BufferedWriter that writes to the log file
+     * @throws IOException Thrown if any file errors occur while writing
+     */
+    public void logResult(BufferedWriter log) throws IOException {
+        for (File file : files) {
+            file.logResult(log);
+        }
+        for (Directory dir : subdirectories) {
+            if (!dir.isMatch()) dir.logResult(log);
         }
     }
 

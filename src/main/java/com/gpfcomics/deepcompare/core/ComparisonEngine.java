@@ -76,7 +76,7 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 log.newLine();
                 log.write(
                         String.format(
-                                Main.RESOURCES.getString("engine.log.being.comparison"),
+                                Main.RESOURCES.getString("engine.log.begin.comparison"),
                                 new Date()
                         )
                 );
@@ -96,10 +96,50 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 );
                 log.newLine();
 
-                // If we're in debug mode, dump a bunch of extra input information:
-                if (options.isDebugMode()) {
-                    // TODO: Log debug options...
+                // Log the chosen hash algorithm:
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.hash"),
+                                options.getHash()
+                        )
+                );
+                log.newLine();
+
+                // If any exclusions were specified:
+                if (!options.getExclusions().isEmpty()) {
+
+                    // Do the exclusions use regexes (true) or DOS/UNIX globs (false)?  (Note that this only gets
+                    // printed if we have exclusions.  Otherwise, there's no point.)
+                    log.write(
+                            String.format(
+                                    Main.RESOURCES.getString("engine.log.exclusions.use.regex"),
+                                    options.isExclusionsRegex() ?
+                                            Main.RESOURCES.getString("engine.log.boolean.true") :
+                                            Main.RESOURCES.getString("engine.log.boolean.false")
+                            )
+                    );
+                    log.newLine();
+
+                    // After a header, print out all the exclusions:
+                    log.write(Main.RESOURCES.getString("engine.log.exclusions.header"));
+                    log.newLine();
+                    for (String exclusion : options.getExclusions()) {
+                        log.write("\t" + exclusion);
+                        log.newLine();
+                    }
+
                 }
+
+                // Are we checking hidden files:
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.hidden.files"),
+                                options.isCheckHiddenFiles() ?
+                                        Main.RESOURCES.getString("engine.log.boolean.true") :
+                                        Main.RESOURCES.getString("engine.log.boolean.false")
+                        )
+                );
+                log.newLine();
 
             }
 
@@ -116,6 +156,15 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 log.newLine();
             }
             sourceDirectory.scan(options, log);
+            if (log != null && options.isDebugMode()) {
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.debug.source.file.count"),
+                                sourceDirectory.getCount()
+                        )
+                );
+                log.newLine();
+            }
 
             // Next, build the target map:
             statusListener.updateStatusMessage(Main.RESOURCES.getString("engine.status.build.target.map"));
@@ -124,6 +173,15 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 log.newLine();
             }
             targetDirectory.scan(options, log);
+            if (log != null && options.isDebugMode()) {
+                log.write(
+                        String.format(
+                                Main.RESOURCES.getString("engine.log.debug.target.file.count"),
+                                targetDirectory.getCount()
+                        )
+                );
+                log.newLine();
+            }
 
             // Get the total number of files and bytes from the two directory maps and report them, first to our status
             // listener, then to the log file (if necessary):
@@ -182,7 +240,21 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
             // exhaustive list of all files.  If the two folders match, a simple message stating that they match will
             // suffice.
             if (log != null) {
-                // TODO: Write results to log file
+
+                if (sourceDirectory.isMatch() && targetDirectory.isMatch()) {
+                    log.write(
+                            Main.RESOURCES.getString("engine.log.all.match")
+                    );
+                    log.newLine();
+                } else {
+                    log.write(
+                            Main.RESOURCES.getString("engine.log.discrepancies.found")
+                    );
+                    log.newLine();
+                    sourceDirectory.logResult(log);
+                    targetDirectory.logResult(log);
+                }
+
             }
 
         // If anything blows up, catch the exception and write the exception to the log, if we're writing one.  Note

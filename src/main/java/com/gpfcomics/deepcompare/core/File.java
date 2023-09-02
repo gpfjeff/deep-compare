@@ -1,8 +1,11 @@
 package com.gpfcomics.deepcompare.core;
 
+import com.gpfcomics.deepcompare.Main;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -109,6 +112,31 @@ public class File {
      */
     public void compare(File companion) {
         hashMatch = hash.equals(companion.getHash());
+    }
+
+    /**
+     * Log discrepancies to the specified log file
+     * @param log An open BufferedWriter that writes to the log file
+     * @throws IOException Thrown if any file errors occur while writing
+     */
+    public void logResult(BufferedWriter log) throws IOException {
+        if (!pathMatch) {
+            log.write(
+                    String.format(
+                            Main.RESOURCES.getString("engine.log.discrepancies.file.not.found"),
+                            pathString
+                    )
+            );
+            log.newLine();
+        } else if (!hashMatch) {
+            log.write(
+                    String.format(
+                            Main.RESOURCES.getString("engine.log.discrepancies.file.hash.not.match"),
+                            pathString
+                    )
+            );
+            log.newLine();
+        }
     }
 
 }
