@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
@@ -30,6 +30,14 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
 
     private final IStatusListener statusListener;
 
+    /**
+     * Constructor
+     * @param sourcePath A String containing the source directory's absolute path
+     * @param targetPath A String containing the target directory's absolute path
+     * @param options A ComparisonOptions object
+     * @param hashListener An IHashProgressListener to notify of hashing progress
+     * @param statusListener An IStatusListener to notify of status changes
+     */
     public ComparisonEngine(
             String sourcePath,
             String targetPath,
@@ -67,8 +75,9 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 // location:
                 log = Files.newBufferedWriter(
                         Paths.get(options.getLogFilePath(), "deep-compare.log").toAbsolutePath(),
+                        StandardOpenOption.WRITE,
                         StandardOpenOption.CREATE,
-                        StandardOpenOption.WRITE
+                        StandardOpenOption.TRUNCATE_EXISTING
                 );
 
                 // Write our preamble, with a header that includes the start time and the source and target directories:
@@ -144,8 +153,8 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
             }
 
             // Declare our source and target trees, initializing them to the input paths:
-            Directory sourceDirectory = new Directory(sourcePath);
-            Directory targetDirectory = new Directory(targetPath);
+            DCDirectory sourceDirectory = new DCDirectory(sourcePath);
+            DCDirectory targetDirectory = new DCDirectory(targetPath);
             result.setSourceDirectory(sourceDirectory);
             result.setTargetDirectory(targetDirectory);
 
@@ -223,7 +232,7 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 log.write(Main.RESOURCES.getString("engine.status.hash.target"));
                 log.newLine();
             }
-            sourceDirectory.hash(hash, hashListener);
+            targetDirectory.hash(hash, hashListener);
 
             // Generate the final report.  Tell the source folder to compare itself against the target folder and vice
             // versa.  This has to be done from both sides, because a file may be missing from one tree and not the
@@ -240,19 +249,62 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
             // exhaustive list of all files.  If the two folders match, a simple message stating that they match will
             // suffice.
             if (log != null) {
-
                 if (sourceDirectory.isMatch() && targetDirectory.isMatch()) {
                     log.write(
                             Main.RESOURCES.getString("engine.log.all.match")
                     );
                     log.newLine();
                 } else {
+
+                    // If there are discrepancies, start by printing a header:
                     log.write(
                             Main.RESOURCES.getString("engine.log.discrepancies.found")
                     );
                     log.newLine();
-                    sourceDirectory.logResult(log);
-                    targetDirectory.logResult(log);
+
+                    // Compile our results, first searching the source directory, then the target.  Note that there is
+                    // no need to check the changed files in the target, as those should already be collected when we
+                    // do the source path.  ("Changed" files exist in both paths but have different hashes, so we know
+                    // they exist and they've already been examined inthe source path.)
+                    sourceDirectory.compileResults(result.getSourceMissingFiles(), result.getChangedFiles());
+                    targetDirectory.compileResults(result.getTargetMissingFiles());
+
+                    // Log the results.  Start with the files in the source path but missing from the target:
+                    if (!result.getSourceMissingFiles().isEmpty()) {
+                        log.write(
+                                Main.RESOURCES.getString("engine.log.discrepancies.source.missing")
+                        );
+                        log.newLine();;
+                        for (DCFile file : result.getSourceMissingFiles()) {
+                            log.write("\t" + file.relativePath(sourcePath));
+                            log.newLine();
+                        }
+                    }
+
+                    // Next, log the files in the target path but missing from the source:
+                    if (!result.getTargetMissingFiles().isEmpty()) {
+                        log.write(
+                                Main.RESOURCES.getString("engine.log.discrepancies.target.missing")
+                        );
+                        log.newLine();;
+                        for (DCFile file : result.getTargetMissingFiles()) {
+                            log.write("\t" + file.relativePath(targetPath));
+                            log.newLine();
+                        }
+                    }
+
+                    // Finally, log the changed files:
+                    if (!result.getChangedFiles().isEmpty()) {
+                        log.write(
+                                Main.RESOURCES.getString("engine.log.discrepancies.changed")
+                        );
+                        log.newLine();;
+                        for (DCFile file : result.getChangedFiles()) {
+                            log.write("\t" + file.relativePath(sourcePath));
+                            log.newLine();
+                        }
+                    }
+
                 }
 
             }

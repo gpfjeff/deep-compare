@@ -1,11 +1,10 @@
 package com.gpfcomics.deepcompare.core;
 
-import com.gpfcomics.deepcompare.Main;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,7 +19,7 @@ import java.util.stream.Stream;
  * results, associating files and sub-folders together.  Both the top-level source and target folders are Directory
  * objects, as are any sub-folders underneath them.
  */
-public class Directory {
+public class DCDirectory {
 
     /* MEMBER VARIABLES **********************************************************************************************/
 
@@ -43,14 +42,14 @@ public class Directory {
      * sub-directories under the current directory.
      */
     @Getter
-    private final List<Directory> subdirectories = new ArrayList<>();
+    private final List<DCDirectory> subdirectories = new ArrayList<>();
 
     /**
      * The list of files contained within this directory.  This should never be null, but may be empty if there are no
      * files contained within the directory.  Sub-directories will be in the subdirectories list.
      */
     @Getter
-    private final List<File> files = new ArrayList<>();
+    private final List<DCFile> files = new ArrayList<>();
 
     /**
      * The total size of all files and sub-directories under this directory.
@@ -66,7 +65,11 @@ public class Directory {
 
     /* CONSTRUCTORS **************************************************************************************************/
 
-    public Directory(String path) {
+    /**
+     * Constructor
+     * @param path A String containing the absolute path to the directory
+     */
+    public DCDirectory(String path) {
         this.pathString = path;
     }
 
@@ -123,7 +126,7 @@ public class Directory {
                                 if (Files.isDirectory(f)) {
                                     // Create a Directory object and add it to the subdirectory list.  Then scan it,
                                     // which should recursively build the file list.
-                                    Directory dir = new Directory(f.toAbsolutePath().toString());
+                                    DCDirectory dir = new DCDirectory(f.toAbsolutePath().toString());
                                     subdirectories.add(dir);
                                     dir.scan(options, log);
                                     // Update the total file size and count based on the subdirectory's own scan:
@@ -131,7 +134,8 @@ public class Directory {
                                     count += dir.getCount();
                                 } else if (Files.isRegularFile(f)) {
                                     // If this is an actual file, create a File object and add it to the file list:
-                                    File file = new File(f.toAbsolutePath().toString());
+                                    DCFile file = new DCFile(f.toAbsolutePath().toString());
+                                    files.add(file);
                                     // Tell the file to scan itself, then add its size to the total size and bump the
                                     // file count by one:
                                     file.scan();
@@ -141,12 +145,30 @@ public class Directory {
                             }
                         }
                     } catch (Exception ex) {
-                        // TODO: What to do if an exception is thrown?
+                        if (log != null) {
+                            try {
+                                if (options.isDebugMode()) {
+                                    log.write(ex.toString());
+                                } else {
+                                    log.write("Error scanning " + f.toAbsolutePath());
+                                }
+                                log.newLine();
+                            } catch (Exception ignored) { }
+                        }
                     }
                 });
             }
         } catch (Exception ex) {
-            // TODO: What to do if an exception is thrown?
+            if (log != null) {
+                try {
+                    if (options.isDebugMode()) {
+                        log.write(ex.toString());
+                    } else {
+                        log.write("Error scanning " + pathString);
+                    }
+                    log.newLine();
+                } catch (Exception ignored) { }
+            }
         }
     }
 
@@ -157,10 +179,10 @@ public class Directory {
      */
     public void hash(MessageDigest hasher, IHashProgressListener listener) {
         // Tell all the files and subdirectories to do their own hashes:
-        for (File file : files) {
+        for (DCFile file : files) {
             file.hash(hasher, listener);
         }
-        for (Directory dir : subdirectories) {
+        for (DCDirectory dir : subdirectories) {
             dir.hash(hasher, listener);
         }
     }
@@ -169,15 +191,15 @@ public class Directory {
      * Compare this directory with its companion directory in the opposite tree
      * @param companion The companion Directory
      */
-    public void compare(Directory companion) {
+    public void compare(DCDirectory companion) {
         // We'll be optimistic and assume for now that the two directories match.  If this proves false, we'll flip
         // this bit.
         match = true;
         // Loop through our own files:
-        for (File file : files) {
+        for (DCFile file : files) {
             // Try to find the companion file in the opposite tree with the same name as this file.  If we fail to find
             // the file, this will return null.
-            File companionFile = companion.getFiles().stream()
+            DCFile companionFile = companion.getFiles().stream()
                     .filter(f -> f.getSimpleName().equals(file.getSimpleName()))
                     .findFirst().orElse(null);
             // If we find the companion file, mark our path as a match, then compare the two file hashes.  This will
@@ -195,9 +217,9 @@ public class Directory {
             }
         }
         // Now loop through our subdirectories:
-        for (Directory dir : subdirectories) {
+        for (DCDirectory dir : subdirectories) {
             // Just as above, look for the subdirectory in the companion folder that matches this directory's name:
-            Directory companionDir = companion.getSubdirectories().stream()
+            DCDirectory companionDir = companion.getSubdirectories().stream()
                     .filter(d -> d.getSimpleName().equals(dir.getSimpleName()))
                     .findFirst().orElse(null);
             // If we found the same subfolder, run it through the same comparison process we did here, then compare its
@@ -214,17 +236,41 @@ public class Directory {
     }
 
     /**
-     * Recursively log discrepancies to the specified log file
-     * @param log An open BufferedWriter that writes to the log file
-     * @throws IOException Thrown if any file errors occur while writing
+     * Sort this directory's files into the appropriate findings list based on the comparison results
+     * @param missingFiles A List of Files containing all files present in this directory but missing from the other
+     * @param changedFiles A List of Files containing all files that are present in both paths but have different
+     *                     contents in the compared folders.  May be null if this list is not required.
+     * @param matchingFiles A List of Files containing all files that match in the comparison.  May be null if this list
+     *                     is not required.
      */
-    public void logResult(BufferedWriter log) throws IOException {
-        for (File file : files) {
-            file.logResult(log);
+    public void compileResults(List<DCFile> missingFiles, List<DCFile> changedFiles, List<DCFile> matchingFiles) {
+        // Ask our files to compare themselves first, then ask all subdirectories to do the same:
+        for (DCFile file : files) {
+            file.compileResults(missingFiles, changedFiles, matchingFiles);
         }
-        for (Directory dir : subdirectories) {
-            if (!dir.isMatch()) dir.logResult(log);
+        for (DCDirectory dir : subdirectories) {
+            dir.compileResults(missingFiles, changedFiles, matchingFiles);
         }
+    }
+
+    /**
+     * Sort this directory's files into the appropriate findings list based on the comparison results
+     * @param missingFiles A List of Files containing all files present in this directory but missing from the other
+     * @param changedFiles A List of Files containing all files that are present in both paths but have different
+     *                     contents in the compared folders
+     */
+    public void compileResults(List<DCFile> missingFiles, List<DCFile> changedFiles) {
+        // A convenience wrapper for the above method that sets the matching file list to null:
+        compileResults(missingFiles, changedFiles, null);
+    }
+
+    /**
+     * Sort this directory's files into the appropriate findings list based on the comparison results
+     * @param missingFiles A List of Files containing all files present in this directory but missing from the other
+     */
+    public void compileResults(List<DCFile> missingFiles) {
+        // A convenience wrapper for the above method that sets the changed and matching file lists to null:
+        compileResults(missingFiles, null, null);
     }
 
 }

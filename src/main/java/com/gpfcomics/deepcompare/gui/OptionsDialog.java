@@ -2,6 +2,7 @@ package com.gpfcomics.deepcompare.gui;
 
 import com.gpfcomics.deepcompare.Main;
 import com.gpfcomics.deepcompare.core.ComparisonOptions;
+import com.gpfcomics.deepcompare.core.Utilities;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -209,11 +210,11 @@ public class OptionsDialog extends JDialog {
                                     !Files.isDirectory(currentPathPath)
                     ) {
                         txtLogPath.setText("");
-                        currentPath = System.getProperty("user.home");
+                        currentPath = Utilities.defaultBrowsePath();
                     }
                 } catch (Exception ex) {
                     txtLogPath.setText("");
-                    currentPath = System.getProperty("user.home");
+                    currentPath = Utilities.defaultBrowsePath();
                 }
                 // Open the file chooser to the starting path and only let the user select directories:
                 JFileChooser chooser = new JFileChooser(currentPath);

@@ -1,7 +1,11 @@
 package com.gpfcomics.deepcompare.core;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class services as a container for our comparison results
@@ -13,12 +17,12 @@ public class ComparisonResult {
     /**
      * The mapped source directory
      */
-    private Directory sourceDirectory;
+    private DCDirectory sourceDirectory;
 
     /**
      * The mapped target directory
      */
-    private Directory targetDirectory;
+    private DCDirectory targetDirectory;
 
     /**
      * The total number of files discovered during the comparison
@@ -34,5 +38,26 @@ public class ComparisonResult {
      * The input comparison options
      */
     private ComparisonOptions options;
+
+    // For the file discrepancy lists, we'll initialize this as empty here, then remove the setter, forcing the caller
+    // to use the lists as-is.
+
+    /**
+     * A list of all files in the source directory that are missing from the target directory
+     */
+    @Setter(AccessLevel.NONE)
+    private List<DCFile> sourceMissingFiles = new ArrayList<>();
+
+    /**
+     * A list of all files in the target directory that are missing from the source directory
+     */
+    @Setter(AccessLevel.NONE)
+    private List<DCFile> targetMissingFiles = new ArrayList<>();
+
+    /**
+     * A list of all files that are in both directories but whose contents are different
+     */
+    @Setter(AccessLevel.NONE)
+    private List<DCFile> changedFiles = new ArrayList<>();
 
 }

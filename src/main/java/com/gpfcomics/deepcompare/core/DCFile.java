@@ -1,23 +1,21 @@
 package com.gpfcomics.deepcompare.core;
 
-import com.gpfcomics.deepcompare.Main;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * This class represents an individual file in the comparison tree.  It maintains the file's own state (name, full
  * path, file size, etc.), as well as its cryptographic hash and whether it matches the path and hash of its companion
  * file (if it exists) in the other directory tree.
  */
-public class File {
+public class DCFile {
 
     /* MEMBER VARIABLES **********************************************************************************************/
 
@@ -54,7 +52,11 @@ public class File {
 
     /* CONSTRUCTORS **************************************************************************************************/
 
-    public File(String path) {
+    /**
+     * Constructor
+     * @param path A String containing the absolute path to the file
+     */
+    public DCFile(String path) {
         this.pathString = path;
     }
 
@@ -66,6 +68,20 @@ public class File {
      */
     public String getSimpleName() {
         return Paths.get(pathString).getFileName().toString();
+    }
+
+    /**
+     * Get the path name of the file relative to the specified root
+     * @param root A String containing the root path to remove from the absolute path
+     * @return A String containing the path to the file relative to the root
+     */
+    public String relativePath(String root) {
+        // Take the substring of the absolute path, starting with the root.  Note that we'll add one to get the path
+        // separator as well.  If the absolute path of file does *NOT* start with the specified root, that's a bug in
+        // the calling code.  Instead of blowing up, just return the raw absolute path.
+        if (pathString.startsWith(root))
+            return pathString.substring( root.length() + 1 );
+        else return pathString;
     }
 
     /**
@@ -110,32 +126,28 @@ public class File {
      * method will only be called after we confirm that both files exist within their respective trees.
      * @param companion The companion File
      */
-    public void compare(File companion) {
+    public void compare(DCFile companion) {
         hashMatch = hash.equals(companion.getHash());
     }
 
     /**
-     * Log discrepancies to the specified log file
-     * @param log An open BufferedWriter that writes to the log file
-     * @throws IOException Thrown if any file errors occur while writing
+     * Sort this file into the appropriate findings list based on the comparison results
+     * @param missingFiles A List of Files containing all files present in this directory but missing from the other
+     * @param changedFiles A List of Files containing all files that are present in both paths but have different
+     *                     contents in the compared folders.  May be null if this list is not required.
+     * @param matchingFiles A List of Files containing all files that match in the comparison.  May be null if this list
+     *                     is not required.
      */
-    public void logResult(BufferedWriter log) throws IOException {
+    public void compileResults(List<DCFile> missingFiles, List<DCFile> changedFiles, List<DCFile> matchingFiles) {
+        // Easy peasy.  Sort the file into the appropriate list, based on our findings.  Check the path flag first, then
+        // the hash flag.  If both flags are true, the file matches and goes into the matching list.  Note that the
+        // changed and missing lists may be null if we're not collecting that info, so check for nulls there first.
         if (!pathMatch) {
-            log.write(
-                    String.format(
-                            Main.RESOURCES.getString("engine.log.discrepancies.file.not.found"),
-                            pathString
-                    )
-            );
-            log.newLine();
+            missingFiles.add(this);
         } else if (!hashMatch) {
-            log.write(
-                    String.format(
-                            Main.RESOURCES.getString("engine.log.discrepancies.file.hash.not.match"),
-                            pathString
-                    )
-            );
-            log.newLine();
+            if (changedFiles != null) changedFiles.add(this);
+        } else {
+            if (matchingFiles != null) matchingFiles.add(this);
         }
     }
 

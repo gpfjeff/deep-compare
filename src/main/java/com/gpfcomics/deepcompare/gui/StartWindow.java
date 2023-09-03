@@ -2,6 +2,7 @@ package com.gpfcomics.deepcompare.gui;
 
 import com.gpfcomics.deepcompare.Main;
 import com.gpfcomics.deepcompare.core.ComparisonOptions;
+import com.gpfcomics.deepcompare.core.Utilities;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -180,11 +181,11 @@ public class StartWindow {
                                 !Files.isDirectory(startPath)
                 ) {
                     targetField.setText("");
-                    pathString = System.getProperty("user.home");
+                    pathString = Utilities.defaultBrowsePath();
                 }
             } catch (Exception ex) {
                 targetField.setText("");
-                pathString = System.getProperty("user.home");
+                pathString = Utilities.defaultBrowsePath();
             }
             // Open the file choose and configure it.  We'll start at the selected path above and restrict the user to
             // only choosing directories:
