@@ -5,6 +5,7 @@ import com.gpfcomics.deepcompare.core.*;
 import lombok.Getter;
 
 import javax.swing.*;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -79,9 +80,9 @@ public class ComparisonWorker extends SwingWorker<ComparisonResult, ComparisonSt
         try {
             // Get and return: our result:
             result = get();
-        } catch (InterruptedException ignored) {
-            // Ignore interrupted exceptions.  Odds are the user clicked Cancel here, so there's nothing we
-            // need to do at this point.
+        } catch (InterruptedException | CancellationException ignored) {
+            // Ignore interrupted and cancellation exceptions.  Odds are the user clicked Cancel here, so there's
+            // nothing we need to do at this point.
         } catch (ExecutionException ee) {
             // All other exceptions should be logged to the log file if logging was enabled.  Show the user an
             // error box, then close this dialog:

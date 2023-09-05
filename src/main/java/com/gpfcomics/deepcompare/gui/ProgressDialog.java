@@ -211,14 +211,17 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
                     dialog.pack();
                     dialog.setVisible(true);
                 }
-            } else {
+            // TODO: Commenting this out for now.  This else block was being hit if the process was cancelled, which
+            //       for some reason returns DONE.  Naturally, the result is null in this case, which was showing this
+            //       error dialog.  Need to differentiate between done-done and cancelled-done.
+            /*} else {
                 // This *SHOULDN'T* happen, but if it does, show an error box if the result is null:
                 JOptionPane.showMessageDialog(
                         this,
                         Main.RESOURCES.getString("progress.error.message"),
                         Main.RESOURCES.getString("dialog.title.error"),
                         JOptionPane.ERROR_MESSAGE
-                );
+                );*/
             }
             dispose();
         }
