@@ -1,6 +1,6 @@
 package com.gpfcomics.deepcompare.core;
 
-import java.io.File;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * A catch-all Swiss Army knife of generic static methods that might be of use throughout the application.  Essentially,
@@ -42,11 +42,10 @@ public class Utilities {
      * @return A String containing the default path to use for all file/directory Browse buttons
      */
     public static String defaultBrowsePath() {
-        // For Windows, start the user in their Documents directory:
-        // TODO: Should we check for older versions of Windows to account for older structures, or is the juice not
-        //       worth the squeeze?
+        // For Windows, start the user in their Documents directory.  The "easiest" way to get this to work is to use
+        // the Swing file chooser FileSystemView to get what it thinks is the user's default directory.
         if (System.getProperty("os.name").startsWith("Windows")) {
-            return System.getProperty("user.home") + File.separator + "Documents";
+            return FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
         }
         // For everyone else (for now), start them in the Java user home directory:
         // TODO: This should work file for UN*X-y like OSes.  What about MacOS?  Should we customize for it?

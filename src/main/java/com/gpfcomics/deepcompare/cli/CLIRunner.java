@@ -1,23 +1,22 @@
 package com.gpfcomics.deepcompare.cli;
 
 import com.gpfcomics.deepcompare.Main;
-import com.gpfcomics.deepcompare.core.ComparisonOptions;
-import lombok.Getter;
-import lombok.Setter;
+import com.gpfcomics.deepcompare.core.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-public class CLIRunner {
+public class CLIRunner implements IHashProgressListener, IStatusListener {
 
     // The command line arguments, passed in from the Main class:
-    @Getter
-    @Setter
-    private String[] args;
+    private final String[] args;
 
     // Our copy of the comparison options class.  This instantiation will set the defaults, which the user can override
     // with command line parameters.
@@ -29,7 +28,16 @@ public class CLIRunner {
     // The target path:
     private String targetPath = null;
 
-    public CLIRunner() { }
+    // The total number of bytes for all files that need to be hashed
+    private long totalBytes = 0L;
+
+    // The cumulative number of bytes hashed up to the last fully-hashed file
+    private long processedBytes = 0L;
+
+    // The cumulative number of bytes hashed on the current file being hashed
+    private long currentFileBytes = 0L;
+
+    private final List<Integer> percentsShown = new ArrayList<>();
 
     public CLIRunner(String[] args) {
         this.args = args;
@@ -72,12 +80,47 @@ public class CLIRunner {
         // If the exclusions are not currently using regular expressions, convert them now.  Note that this is
         // is a one-way conversion.
         if (!options.isExclusionsRegex()) { options.convertSimpleWildcardsToRegex(); }
-        // All our command-line arguments look good.  Launch the comparison engine and get to work:
-        // TODO: Do the actual work here...
-        System.out.println("WARNING: COMMAND-LINE MODE NOT IMPLEMENTED YET!");
-        System.out.println();
-        printUsage();
-        return 0;
+        // All our command-line arguments look good.  Time to get to work:
+        try {
+            // We're going to take advantage of the fact that the comparison engine runs on a different thread.  Create
+            // a new executor, create an instance of our comparison engine, submit the engine to the executor, and sit
+            // back and wait.  (The listeners will feed back progress information to this thread so we can update the
+            // UI.)
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            ComparisonEngine engine = new ComparisonEngine(
+                    sourcePath,
+                    targetPath,
+                    options,
+                    this,
+                    this
+            );
+            Future<ComparisonResult> worker = executor.submit(engine);
+            ComparisonResult result = worker.get();
+            // Check the result.  It shouldn't be null, but we'll add a check for that, just in case.  Do a simple check
+            // to see if the two directories match, then print either the confirmation of that or the warning that
+            // discrepancies were found.  For the CLI, that's all we're going to do on the screen.  For the full
+            // results, we'll direct the user to the mandatory log file.
+            if (result != null) {
+                if (result.getSourceDirectory().isMatch() && result.getTargetDirectory().isMatch()) {
+                    System.out.println(Main.RESOURCES.getString("cli.all.match"));
+                } else {
+                    System.out.println(Main.RESOURCES.getString("cli.discrepancies.found"));
+                }
+                System.out.println(Main.RESOURCES.getString("cli.see.log"));
+                return 0;
+            } else {
+                System.err.println(Main.RESOURCES.getString("cli.error.generic"));
+                return 1;
+            }
+        } catch (Exception ex) {
+            // There's a chance exceptions could be thrown here.  Catch them and warn the user that something went
+            // wrong:
+            // TODO: For now, I'm having this dump the exceptions to STDERR, since we don't really have a log here.
+            //       (The comparison engine "owns" the log file, which would already be closed at this point.)
+            //System.err.println(Main.RESOURCES.getString("cli.error.generic"));
+            System.err.println(ex);
+            return 1;
+        }
     }
 
     /**
@@ -311,6 +354,72 @@ public class CLIRunner {
         }
         // Return the final error list:
         return errors;
+    }
+
+    // IStatusListener methods:
+    @Override
+    public void updateStatusMessage(String message) {
+        System.out.println(message);
+    }
+
+    @Override
+    public void errorMessage(String message) {
+        System.err.println(message);
+    }
+
+    @Override
+    public void updateTotalFiles(long fileCount) {
+        System.out.println(
+                String.format(
+                        Main.RESOURCES.getString("cli.files.discovered"),
+                        fileCount
+                )
+        );
+    }
+
+    @Override
+    public void updateTotalBytes(long totalBytes) {
+        this.totalBytes = totalBytes;
+        System.out.println(
+                String.format(
+                        Main.RESOURCES.getString("cli.bytes.discovered"),
+                        Utilities.prettyPrintFileSize(totalBytes)
+                )
+        );
+    }
+
+    // IHashProgressListener methods:
+    @Override
+    public void newFile() {
+        // Whenever the engine starts a new file, add the previous file's byte count to the running total of processed
+        // bytes, then reset the current file to zero:
+        processedBytes += currentFileBytes;
+        currentFileBytes = 0L;
+    }
+
+    @Override
+    public void updateProgress(long bytesRead) {
+        // Add the number of bytes read to the current file's running total:
+        currentFileBytes += bytesRead;
+        // Calculate the percentage of the total number of bytes hashed.  For this, we'll add the current file's bytes
+        // to the previous files' total, then divide by the total number of bytes.  There's a lot of type conversion
+        // here, but the goal is to get to a round integer between 0 and 100.
+        int percent = (int) Math.floor(
+                (((double) processedBytes + (double) currentFileBytes) / (double) totalBytes) * 100.0d
+        );
+        // Report our progress at approximately 10% intervals.  If the percentage is evenly divisible by ten, check to
+        // see if we've already reported our progress.  If not, do so now.  The "percents shown" list will keep us from
+        // reporting the same percentage multiple times, on the off-chance that the calculation above resolves to the
+        // same number multiple times.
+        if (percent % 10 == 0 && !percentsShown.contains(percent)) {
+            System.out.println(
+                    String.format(
+                            Main.RESOURCES.getString("cli.hash.progress"),
+                            percent + "%"
+                    )
+            );
+            percentsShown.add(percent);
+        }
     }
 
 }

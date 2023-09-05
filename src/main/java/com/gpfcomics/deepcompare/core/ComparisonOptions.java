@@ -120,7 +120,7 @@ public class ComparisonOptions {
                 // Loop through the current list:
                 for (String exclusion : exclusions) {
                     // Preserve any existing periods:
-                    String newPattern = exclusion.replaceAll("\\.", "\\.");
+                    String newPattern = exclusion.replaceAll("\\.", "\\\\.");
                     // Convert single-character matches (question marks) to a dot:
                     newPattern = newPattern.replaceAll("\\?", ".");
                     // Convert multi-character matches (asterisks) to a "match anything" pattern:

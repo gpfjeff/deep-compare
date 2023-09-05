@@ -1,8 +1,12 @@
 package com.gpfcomics.deepcompare.core;
 
+import com.gpfcomics.deepcompare.Main;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -86,23 +90,21 @@ public class DCFile {
 
     /**
      * Scan this individual file, taking note of its current file size
+     * @throws IOException Thrown if anything blows up while scanning the file
      */
-    public void scan() {
-        // This is seems pretty simple, but for now all we'll do is get our file size and keep track of it.  The parent
+    public void scan() throws IOException {
+        // This seems pretty simple, but for now all we'll do is get our file size and keep track of it.  The parent
         // directory will reference this to get the total size of the directory.
-        try {
-            size = Files.size(Paths.get(pathString));
-        } catch (Exception ex) {
-            // TODO: What to do if an exception is thrown?
-        }
+        size = Files.size(Paths.get(pathString));
     }
 
     /**
      * Generate the cryptographic hash of this file
      * @param hasher A MessageDigest object, which will perform the hash
      * @param listener The IHashProgressListener to report progress to
+     * @param log An open BufferedWriter representing the log file
      */
-    public void hash(MessageDigest hasher, IHashProgressListener listener) {
+    public void hash(MessageDigest hasher, IHashProgressListener listener, BufferedWriter log) {
         // Open the file and read in the raw bytes, feeding them to the hash algorithm.  As we update the hash, we'll
         // also send the number of bytes read to the listener to update our progress.  Once the file read is complete,
         // compute the final digest and Base64 encode it, storing the string in our local variable.
@@ -116,7 +118,20 @@ public class DCFile {
             };
             hash = Base64.getEncoder().encodeToString(hasher.digest());
         } catch (Exception ex) {
-            // TODO: What to do if an exception is thrown?
+            // If anything above blows up, log an error (if we're keeping a log) and set our hash to null:
+            if (log != null) {
+                try {
+                    log.write(
+                            String.format(
+                                    Main.RESOURCES.getString("engine.log.hash.error"),
+                                    pathString
+                            )
+                    );
+                    log.newLine();
+                    log.write(ex.toString());
+                    log.newLine();
+                } catch (Exception ignored) { }
+            }
             hash = null;
         }
     }
@@ -127,7 +142,11 @@ public class DCFile {
      * @param companion The companion File
      */
     public void compare(DCFile companion) {
-        hashMatch = hash.equals(companion.getHash());
+        // This should (hopefully) never happen, but if either our hash or the companion object are null, declare the
+        // hash not a match.  Otherwise, compare the two hashes and return the result.  (If the companion's hash is
+        // null, the comparison should still return false.  The null check is mostly to prevent NPEs.)
+        if (hash == null || companion == null) hashMatch = false;
+        else hashMatch = hash.equals(companion.getHash());
     }
 
     /**
@@ -149,6 +168,27 @@ public class DCFile {
         } else {
             if (matchingFiles != null) matchingFiles.add(this);
         }
+    }
+
+    /**
+     * Sort this file into its appropriate category tree for the GUI.  The tree nodes passed in represent our parent
+     * directory's node.  This will attach our file node to the relevant parent.
+     * @param missingNode A DefaultMutableTreeNode representing our missing files node
+     * @param changedNode A DefaultMutableTreeNode representing our changed files node
+     * @param matchingNode A DefaultMutableTreeNode representing our matching files node
+     */
+    public void buildTree(
+            DefaultMutableTreeNode missingNode,
+            DefaultMutableTreeNode changedNode,
+            DefaultMutableTreeNode matchingNode
+    ) {
+        // Create a node for ourselves.  Note that we won't allow this node to have any children.
+        DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(getSimpleName(), false);
+        // Sort ourselves into the correct bucket.  As with compileResults() above, path mismatches override hash
+        // mismatches, which in turn overrides matches.
+        if (!pathMatch) missingNode.add(fileNode);
+        else if (!hashMatch) changedNode.add(fileNode);
+        else matchingNode.add(fileNode);
     }
 
 }

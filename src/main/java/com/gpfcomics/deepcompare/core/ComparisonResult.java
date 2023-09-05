@@ -43,6 +43,12 @@ public class ComparisonResult {
     // to use the lists as-is.
 
     /**
+     * A list of all files that match in both directories
+     */
+    @Setter(AccessLevel.NONE)
+    private List<DCFile> matchingFiles = new ArrayList<>();
+
+    /**
      * A list of all files in the source directory that are missing from the target directory
      */
     @Setter(AccessLevel.NONE)

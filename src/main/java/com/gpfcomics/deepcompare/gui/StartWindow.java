@@ -141,10 +141,7 @@ public class StartWindow {
                 }
                 // At this point, we should be good to go.  Pass our parameters to the core comparison engine and
                 // put it to work:
-                // TODO: Obviously, we haven't gotten that far yet...
-                /*JOptionPane.showMessageDialog(null,
-                        "Everything looks good! Here's where the fun begins...");*/
-                ProgressDialog dialog = new ProgressDialog(sourceString, targetString, options);
+                ProgressDialog dialog = new ProgressDialog(parent, sourceString, targetString, options);
                 dialog.pack();
                 dialog.setVisible(true);
             } catch (Exception ex) {

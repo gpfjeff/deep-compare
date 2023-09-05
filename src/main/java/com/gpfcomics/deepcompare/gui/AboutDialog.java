@@ -24,7 +24,7 @@ public class AboutDialog extends JDialog {
 
     public AboutDialog(Frame owner) {
 
-        super(owner, "About", true);
+        super(owner, Main.RESOURCES.getString("about.dialog.title"), true);
 
         setContentPane(contentPane);
         setModal(true);

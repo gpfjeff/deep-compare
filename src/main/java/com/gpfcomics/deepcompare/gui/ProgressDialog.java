@@ -17,6 +17,11 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.ResourceBundle;
 
+/**
+ * This progress dialog displays in GUI mode as the ComparisonEngine does the actual work.  It displays various status
+ * messages, as well as a progress bar during the lengthiest and most complex part of the work:  hashing the files.  A
+ * cancel button allows the user to cancel the long-running process if they choose to abort.
+ */
 public class ProgressDialog extends JDialog implements IStatusListener, IHashProgressListener, PropertyChangeListener {
 
     // GUI Builder controls:
@@ -25,37 +30,63 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
     private JLabel lblStatus;
     private JProgressBar progressBar;
 
+    private final Frame owner;
+
+    // The total number of bytes for all files that need to be hashed
     private long totalBytes = 0L;
 
+    // The cumulative number of bytes hashed up to the last fully-hashed file
     private long processedBytes = 0L;
 
+    // The cumulative number of bytes hashed on the current file being hashed
     private long currentFileBytes = 0L;
 
+    // The total number of files to be hashed
+    // TODO: Need to decide if this is needed.  Either add it to the UI or remove.
     private long totalFiles = 0L;
 
-    //private ExecutorService executor;
-
+    // The workhorse for the GUI.  This subclass of SwingWorker runs the ComparisonEngine in a separate thread to keep
+    // the GUI responsive.
     private final ComparisonWorker worker;
 
+    /**
+     * Constructor
+     *
+     * @param sourcePath A String containing the absolute path to the source directory
+     * @param targetPath A String containing the absolute path to the target directory
+     * @param options    A ComparisonOptions object
+     */
     public ProgressDialog(
+            Frame owner,
             String sourcePath,
             String targetPath,
             ComparisonOptions options
     ) {
 
+        super(owner, Main.RESOURCES.getString("progress.dialog.title"), true);
+        this.owner = owner;
+
+        // Set up our content pane and dialog.
         setContentPane(contentPane);
         setModal(true);
+
+        // There will be only one button on this dialog:  the Cancel button.  So make it the default:
         getRootPane().setDefaultButton(btnCancel);
 
+        // Set the status label to our "starting up" message:
         lblStatus.setText(Main.RESOURCES.getString("engine.status.startup"));
 
+        // Set our progress bar minimum and maximum values, and initialize it to zero.  (These are probably the defaults
+        // anyway, but I'd rather be explicit.)  Note that the progress bar will show a percentage of the number of
+        // bytes that have been hashed so far.
         progressBar.setMinimum(0);
         progressBar.setMaximum(100);
         progressBar.setValue(0);
 
+        // Wire up the cancel button:
         btnCancel.addActionListener(e -> onCancel());
 
-        // call onCancel() when cross is clicked
+        // If the user clicks the close button in the upper right corner, treat it like clicking Cancel:
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -63,13 +94,15 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
             }
         });
 
-        // call onCancel() on ESCAPE
+        // Do the same with the Escape button:
         contentPane.registerKeyboardAction(
                 e -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
+        // Set up the comparison worker, feeding it our inputs.  We'll also pass in ourselves as the hash and status
+        // listeners so we'll know what the comparison engine is up to.
         worker = new ComparisonWorker(
                 this,
                 sourcePath,
@@ -79,36 +112,17 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
                 this
         );
 
+        // As a SwingWorker, the comparison working also looks for a property change listener.  We'll play that role
+        // as well.
         worker.addPropertyChangeListener(this);
 
+        // Tell the worker to get to work:
         worker.execute();
-
-        /*try {
-
-            executor = Executors.newSingleThreadExecutor();
-
-            Future<ComparisonResult> future = executor.submit(
-                    new ComparisonEngine(
-                            sourcePath,
-                            targetPath,
-                            options,
-                            this,
-                            this
-                    )
-            );
-
-            ComparisonResult result = future.get();
-
-        } catch (InterruptedException ie) {
-
-        } catch (ExecutionException ee) {
-
-        } catch (Exception ex) {
-
-        }*/
 
     }
 
+    // If the user clicks the Cancel button, hits Escape, or attempts to close the dialog, prompt the user to see if
+    // they really want to cancel the job.  If they do, tell the worker to stop and close the dialog.
     private void onCancel() {
         int result = JOptionPane.showConfirmDialog(
                 this,
@@ -123,7 +137,9 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
         }
     }
 
-    // IStatusListener methods:
+    // IStatusListener methods.  These receive status from the comparison engine, which we'll want to pass along to the
+    // user.  This mostly involves taking note of the total files and bytes, as well as displaying status messages.
+
     @Override
     public void updateTotalFiles(long fileCount) {
         totalFiles = fileCount;
@@ -144,38 +160,63 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
         lblStatus.setText(message);
     }
 
-    // IHashProgressListener methods:
+    // IHashProgressListener methods.  These inform us of the status of the hashing job.  This mostly drives the
+    // progress bar.
+
     @Override
     public void newFile() {
+        // Whenever the engine starts a new file, add the previous file's byte count to the running total of processed
+        // bytes, then reset the current file to zero:
         processedBytes += currentFileBytes;
         currentFileBytes = 0L;
     }
 
     @Override
     public void updateProgress(long bytesRead) {
+        // Add the number of bytes read to the current file's running total:
         currentFileBytes += bytesRead;
-        int percent = (int) Math.floor((((double) processedBytes + (double) currentFileBytes) / (double) totalBytes) * 100);
+        // Calculate the percentage of the total number of bytes hashed.  For this, we'll add the current file's bytes
+        // to the previous files' total, then divide by the total number of bytes.  There's a lot of type conversion
+        // here, but the goal is to get to a round integer between 0 and 100.
+        int percent = (int) Math.floor(
+                (((double) processedBytes + (double) currentFileBytes) / (double) totalBytes) * 100.0d
+        );
+        // Update the progress bar.  To avoid flicker, we'll only update the display if the percentage has changed from
+        // the previous value.
         if (percent != progressBar.getValue())
             progressBar.setValue(percent);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        // If the engine finishes its job, close this dialog and show either the result dialog or an error, depending
+        // on whether we get any useful results:
         if (SwingWorker.StateValue.DONE == evt.getNewValue()) {
             ComparisonResult result = worker.getResult();
             if (result != null) {
-                // TODO: Build result dialog
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Comparison was a success! Eventually, we'll show the result dialog here...",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
+                // If both directories match, there's no point showing the full result dialog.  Just show a quick
+                // message dialog with a success message.  (This is a compromise between some of the logic.  If both
+                // sides match, there's not a lot of point giving the user a complex GUI of identical file trees to
+                // scroll through.)
+                if (result.getSourceDirectory().isMatch() && result.getTargetDirectory().isMatch()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            Main.RESOURCES.getString("result.all.match"),
+                            Main.RESOURCES.getString("result.dialog.title"),
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                } else {
+                    // Looks like we've got to show our work.  Launch the result dialog to show what's different:
+                    ResultDialog dialog = new ResultDialog(owner, result);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
             } else {
+                // This *SHOULDN'T* happen, but if it does, show an error box if the result is null:
                 JOptionPane.showMessageDialog(
                         this,
-                        "Results were null. We may not need this message, but popping it up just in case...",
-                        "Error",
+                        Main.RESOURCES.getString("progress.error.message"),
+                        Main.RESOURCES.getString("dialog.title.error"),
                         JOptionPane.ERROR_MESSAGE
                 );
             }

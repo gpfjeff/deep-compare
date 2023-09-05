@@ -1,10 +1,11 @@
 package com.gpfcomics.deepcompare.core;
 
+import com.gpfcomics.deepcompare.Main;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -107,7 +108,7 @@ public class DCDirectory {
                             // on some flavor of Windows, we'll treat the regex as case-insensitive; otherwise, we'll
                             // assume it's case-sensitive.
                             boolean addToList = true;
-                            String simpleName = getSimpleName();
+                            String simpleName = f.getFileName().toString();
                             boolean caseInsensitive = System.getProperty("os.name").startsWith("Windows");
                             for (String exclusion : options.getExclusions()) {
                                 try {
@@ -150,7 +151,12 @@ public class DCDirectory {
                                 if (options.isDebugMode()) {
                                     log.write(ex.toString());
                                 } else {
-                                    log.write("Error scanning " + f.toAbsolutePath());
+                                    log.write(
+                                            String.format(
+                                                    Main.RESOURCES.getString("engine.log.scan.error"),
+                                                    f.toAbsolutePath()
+                                            )
+                                    );
                                 }
                                 log.newLine();
                             } catch (Exception ignored) { }
@@ -164,7 +170,12 @@ public class DCDirectory {
                     if (options.isDebugMode()) {
                         log.write(ex.toString());
                     } else {
-                        log.write("Error scanning " + pathString);
+                        log.write(
+                                String.format(
+                                        Main.RESOURCES.getString("engine.log.scan.error"),
+                                        pathString
+                                )
+                        );
                     }
                     log.newLine();
                 } catch (Exception ignored) { }
@@ -176,14 +187,15 @@ public class DCDirectory {
      * Recursively generate the cryptographic hashes for all files under this directory
      * @param hasher A MessageDigest object that will be used to generate the hashes
      * @param listener An IHashProgressListener to report progress to
+     * @param log An open BufferedWriter representing the log file
      */
-    public void hash(MessageDigest hasher, IHashProgressListener listener) {
+    public void hash(MessageDigest hasher, IHashProgressListener listener, BufferedWriter log) {
         // Tell all the files and subdirectories to do their own hashes:
         for (DCFile file : files) {
-            file.hash(hasher, listener);
+            file.hash(hasher, listener, log);
         }
         for (DCDirectory dir : subdirectories) {
-            dir.hash(hasher, listener);
+            dir.hash(hasher, listener, log);
         }
     }
 
@@ -271,6 +283,38 @@ public class DCDirectory {
     public void compileResults(List<DCFile> missingFiles) {
         // A convenience wrapper for the above method that sets the changed and matching file lists to null:
         compileResults(missingFiles, null, null);
+    }
+
+    /**
+     * Recursively build the GUI result tree.  The input tree nodes passed in represent "our" (i.e., the current level
+     * in the directory tree) nodes, to which we will add files and directories as needed.
+     * @param missingNode A DefaultMutableTreeNode representing our missing files node
+     * @param changedNode A DefaultMutableTreeNode representing our changed files node
+     * @param matchingNode A DefaultMutableTreeNode representing our matching files node
+     */
+    public void buildTree(
+            DefaultMutableTreeNode missingNode,
+            DefaultMutableTreeNode changedNode,
+            DefaultMutableTreeNode matchingNode
+    ) {
+        // Loop through the files that are direct children to this directory and ask them to sort themselves.  Note that
+        // if we have no direct file children, nothing happens here.
+        for (DCFile file : files) {
+            file.buildTree(missingNode, changedNode, matchingNode);
+        }
+        // Now loop through our subdirectories.  Build child nodes for each type (missing, changed, and matching), then
+        // recursively as each directory to sort themselves.
+        for (DCDirectory dir : subdirectories) {
+            DefaultMutableTreeNode myMissingNode = new DefaultMutableTreeNode(dir.getSimpleName(), true);
+            DefaultMutableTreeNode myChangedNode = new DefaultMutableTreeNode(dir.getSimpleName(), true);
+            DefaultMutableTreeNode myMatchingNode = new DefaultMutableTreeNode(dir.getSimpleName(), true);
+            dir.buildTree(myMissingNode, myChangedNode, myMatchingNode);
+            // If our child nodes have their own children, add them to our tree.  Otherwise, discard the node.  This
+            // way, only relevant nodes will be created.
+            if (myMissingNode.getChildCount() > 0) missingNode.add(myMissingNode);
+            if (myChangedNode.getChildCount() > 0) changedNode.add(myChangedNode);
+            if (myMatchingNode.getChildCount() > 0) matchingNode.add(myMatchingNode);
+        }
     }
 
 }

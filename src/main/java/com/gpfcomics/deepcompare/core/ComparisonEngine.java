@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 /**
@@ -20,14 +20,19 @@ import java.util.concurrent.Callable;
  */
 public class ComparisonEngine implements Callable<ComparisonResult> {
 
+    // The absolute path to the source directory
     private final String sourcePath;
 
+    // The absolute path to the target directory
     private final String targetPath;
 
+    // Our comparison options
     private final ComparisonOptions options;
 
+    // The hash progress listener to notify of hash updates
     private final IHashProgressListener hashListener;
 
+    // The status listener to notify of status updates
     private final IStatusListener statusListener;
 
     /**
@@ -59,6 +64,7 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
         // but the null default will let us shortcut the logging steps if we don't need them.
         BufferedWriter log = null;
 
+        // Start building our result object and go ahead and pass it our options object:
         ComparisonResult result = new ComparisonResult();
         result.setOptions(options);
 
@@ -69,7 +75,7 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
             statusListener.updateStatusMessage(Main.RESOURCES.getString("engine.status.startup"));
 
             // Set up the log file if directed to do so:
-            if (!options.getLogFilePath().isEmpty()) {
+            if (options.getLogFilePath() != null && !options.getLogFilePath().isEmpty()) {
 
                 // Create the writer, overwriting any existing file by the same name that may already exist in that
                 // location:
@@ -224,7 +230,7 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 log.newLine();
             }
             MessageDigest hash = MessageDigest.getInstance(options.getHash());
-            sourceDirectory.hash(hash, hashListener);
+            sourceDirectory.hash(hash, hashListener, log);
 
             // Do the same for the target tree:
             statusListener.updateStatusMessage(Main.RESOURCES.getString("engine.status.hash.target"));
@@ -232,7 +238,7 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                 log.write(Main.RESOURCES.getString("engine.status.hash.target"));
                 log.newLine();
             }
-            targetDirectory.hash(hash, hashListener);
+            targetDirectory.hash(hash, hashListener, log);
 
             // Generate the final report.  Tell the source folder to compare itself against the target folder and vice
             // versa.  This has to be done from both sides, because a file may be missing from one tree and not the
@@ -243,6 +249,15 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
             statusListener.updateStatusMessage(Main.RESOURCES.getString("engine.status.generate.report"));
             sourceDirectory.compare(targetDirectory);
             targetDirectory.compare(sourceDirectory);
+
+            // Compile our results, first searching the source directory, then the target.  Note that there is no need
+            // to check the changed files in the target, as those should already be collected when we do the source
+            // path.  ("Changed" files exist in both paths but have different hashes, so we know they exist and they've
+            // already been examined in the source path.)
+            sourceDirectory.compileResults(
+                    result.getSourceMissingFiles(), result.getChangedFiles(), result.getMatchingFiles()
+            );
+            targetDirectory.compileResults(result.getTargetMissingFiles());
 
             // Log our results to the log file.  For CLI mode, this is our only useful output, while for GUI mode its
             // an added bonus.  For the log file, we'll only be concerned with logging discrepancies; we don't need an
@@ -261,13 +276,6 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                             Main.RESOURCES.getString("engine.log.discrepancies.found")
                     );
                     log.newLine();
-
-                    // Compile our results, first searching the source directory, then the target.  Note that there is
-                    // no need to check the changed files in the target, as those should already be collected when we
-                    // do the source path.  ("Changed" files exist in both paths but have different hashes, so we know
-                    // they exist and they've already been examined inthe source path.)
-                    sourceDirectory.compileResults(result.getSourceMissingFiles(), result.getChangedFiles());
-                    targetDirectory.compileResults(result.getTargetMissingFiles());
 
                     // Log the results.  Start with the files in the source path but missing from the target:
                     if (!result.getSourceMissingFiles().isEmpty()) {
@@ -321,7 +329,7 @@ public class ComparisonEngine implements Callable<ComparisonResult> {
                     log.newLine();
                 } catch (Exception ignored) { }
             }
-            throw new ComparisonException();
+            throw new ComparisonException(ex);
 
         // Finally, flush and close the log if necessary:
         } finally {
