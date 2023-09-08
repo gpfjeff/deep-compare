@@ -105,16 +105,20 @@ public class DCDirectory {
                             // then check each exclusion in the list and see it's a match.  If it matches, flag the
                             // file so we'll skip it.  Note that if the pattern is invalid and won't compile, we'll
                             // silently skip the pattern and assume it's not a match.  Also note that if we're running
-                            // on some flavor of Windows, we'll treat the regex as case-insensitive; otherwise, we'll
-                            // assume it's case-sensitive.
+                            // on some flavor of Windows or MacOS, we'll treat the regex as case-insensitive; otherwise,
+                            // we'll assume it's case-sensitive.
                             boolean addToList = true;
                             String simpleName = f.getFileName().toString();
-                            boolean caseInsensitive = System.getProperty("os.name").startsWith("Windows");
+                            boolean caseInsensitive =
+                                    System.getProperty("os.name").startsWith("Windows") ||
+                                    System.getProperty("os.name").startsWith("Mac");
                             for (String exclusion : options.getExclusions()) {
                                 try {
                                     Pattern regex;
-                                    if (caseInsensitive) regex = Pattern.compile(exclusion, Pattern.CASE_INSENSITIVE);
-                                    else regex = Pattern.compile(exclusion);
+                                    if (caseInsensitive)
+                                        regex = Pattern.compile(exclusion, Pattern.CASE_INSENSITIVE);
+                                    else
+                                        regex = Pattern.compile(exclusion);
                                     if (regex.matcher(simpleName).matches()) {
                                         addToList = false;
                                         break;
@@ -145,39 +149,43 @@ public class DCDirectory {
                                 }
                             }
                         }
+                    // Inner exception catch (at the current file/directory).  If logging is turned on, log the error.
+                    // If debugging is turned on, include the full exception.
                     } catch (Exception ex) {
                         if (log != null) {
                             try {
+                                log.write(
+                                        String.format(
+                                                Main.RESOURCES.getString("engine.log.scan.error"),
+                                                f.toAbsolutePath()
+                                        )
+                                );
+                                log.newLine();
                                 if (options.isDebugMode()) {
                                     log.write(ex.toString());
-                                } else {
-                                    log.write(
-                                            String.format(
-                                                    Main.RESOURCES.getString("engine.log.scan.error"),
-                                                    f.toAbsolutePath()
-                                            )
-                                    );
+                                    log.newLine();
                                 }
-                                log.newLine();
                             } catch (Exception ignored) { }
                         }
                     }
                 });
             }
+        // Outer exception catch, if things go horribly wrong.  As above, log an error message if logging is enabled,
+        // and include the exception if debugging is on.
         } catch (Exception ex) {
             if (log != null) {
                 try {
+                    log.write(
+                            String.format(
+                                    Main.RESOURCES.getString("engine.log.scan.error"),
+                                    pathString
+                            )
+                    );
+                    log.newLine();
                     if (options.isDebugMode()) {
                         log.write(ex.toString());
-                    } else {
-                        log.write(
-                                String.format(
-                                        Main.RESOURCES.getString("engine.log.scan.error"),
-                                        pathString
-                                )
-                        );
+                        log.newLine();
                     }
-                    log.newLine();
                 } catch (Exception ignored) { }
             }
         }

@@ -26,6 +26,12 @@
             <constraints border-constraint="Center"/>
             <properties/>
           </component>
+          <component id="5be2" class="javax.swing.JLabel" binding="lblFilesAndBytes">
+            <constraints border-constraint="South"/>
+            <properties>
+              <text resource-bundle="MessagesBundle" key="progress.files.label.wait"/>
+            </properties>
+          </component>
         </children>
       </grid>
       <grid id="94766" layout-manager="BorderLayout" hgap="0" vgap="0">

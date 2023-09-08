@@ -43,12 +43,14 @@ public class Utilities {
      */
     public static String defaultBrowsePath() {
         // For Windows, start the user in their Documents directory.  The "easiest" way to get this to work is to use
-        // the Swing file chooser FileSystemView to get what it thinks is the user's default directory.
+        // the Swing file chooser FileSystemView to get what it thinks is the user's default directory.  (The system
+        // property "user.home" puts us at the root of the user's personal folders, but most Windows users will probably
+        // expect to start in their Documents directory.)
         if (System.getProperty("os.name").startsWith("Windows")) {
             return FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
         }
-        // For everyone else (for now), start them in the Java user home directory:
-        // TODO: This should work file for UN*X-y like OSes.  What about MacOS?  Should we customize for it?
+        // For everyone else, start them in the Java user home directory.  This should work for MacOS and anything
+        // UN*X-y.
         else return System.getProperty("user.home");
     }
 

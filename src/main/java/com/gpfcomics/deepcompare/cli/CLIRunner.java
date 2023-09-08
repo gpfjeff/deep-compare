@@ -71,7 +71,9 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
         List<String> errors = parseCommandLineArgs();
         if (!errors.isEmpty()) {
             for (String error : errors) {
-                System.out.println("ERROR:  " + error);
+                System.out.println(
+                        Main.RESOURCES.getString("cli.error.prefix") + " " + error
+                );
             }
             System.out.println();
             printUsage();
@@ -117,8 +119,8 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
             // wrong:
             // TODO: For now, I'm having this dump the exceptions to STDERR, since we don't really have a log here.
             //       (The comparison engine "owns" the log file, which would already be closed at this point.)
-            //System.err.println(Main.RESOURCES.getString("cli.error.generic"));
-            System.err.println(ex);
+            System.err.println(Main.RESOURCES.getString("cli.error.generic"));
+            ex.printStackTrace();
             return 1;
         }
     }
@@ -197,12 +199,15 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
             // should get either one or two parts, depending on the argument.
             String[] argParts = arg.replace("--", "").split("\\=", 2);
             // Doing a case-insensitive compare, check the first part of the argument:
+            // TODO: Not sure if we can internationalize the argument names here.  The existing switch statement
+            //       obviously won't work, since we can't guarantee unique paths.  Kicking this down the road as a
+            //       potential future enhancement.
             switch (argParts[0].toLowerCase()) {
                 // Set the source path:
                 case "source":
                     // Make sure the second part of the argument is present and populated:
                     if (argParts.length < 2 || argParts[1] == null || argParts[1].trim().isEmpty()) {
-                        errors.add("Source path not found");
+                        errors.add(Main.RESOURCES.getString("cli.error.source.path.not.found"));
                     } else {
                         // Check to see if the second part is a valid directory.  If it is, take note of it.  If not,
                         // generate an error:
@@ -212,10 +217,10 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                             if (Files.exists(path) && Files.isDirectory(path)) {
                                 sourcePath = pathString;
                             } else {
-                                errors.add("Source path is not a valid directory");
+                                errors.add(Main.RESOURCES.getString("cli.error.source.path.not.valid"));
                             }
                         } catch (Exception ex) {
-                            errors.add("Source path is not a valid directory");
+                            errors.add(Main.RESOURCES.getString("cli.error.source.path.not.valid"));
                         }
                     }
                     break;
@@ -223,7 +228,7 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                 case "target":
                     // This is pretty much exactly the same as the source path argument, just for the target:
                     if (argParts.length < 2 || argParts[1] == null || argParts[1].trim().isEmpty()) {
-                        errors.add("Target path not found");
+                        errors.add(Main.RESOURCES.getString("cli.error.target.path.not.found"));
                     } else {
                         try {
                             String pathString = argParts[1].trim();
@@ -231,10 +236,10 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                             if (Files.exists(path) && Files.isDirectory(path)) {
                                 targetPath = pathString;
                             } else {
-                                errors.add("Target path is not a valid directory");
+                                errors.add(Main.RESOURCES.getString("cli.error.target.path.not.valid"));
                             }
                         } catch (Exception ex) {
-                            errors.add("Target path is not a valid directory");
+                            errors.add(Main.RESOURCES.getString("cli.error.target.path.not.valid"));
                         }
                     }
                     break;
@@ -242,7 +247,7 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                 case "exclusions":
                     // Again, make sure the second part of the parameter is populated:
                     if (argParts.length < 2 || argParts[1] == null || argParts[1].trim().isEmpty()) {
-                        errors.add("Exclusions file not found");
+                        errors.add(Main.RESOURCES.getString("cli.error.exclusions.file.not.found"));
                     } else {
                         try {
                             // This should be a simple text file.  If it exists and is readable, slurp up the file and
@@ -261,10 +266,10 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                                     });
                                 }
                             } else {
-                                errors.add("Exclusions path is not a valid file");
+                                errors.add(Main.RESOURCES.getString("cli.error.exclusions.not.valid.file"));
                             }
                         } catch (Exception ex) {
-                            errors.add("Exclusions path is not a valid file or could not be read");
+                            errors.add(Main.RESOURCES.getString("cli.error.exclusions.cannot.read"));
                         }
                     }
                     break;
@@ -279,9 +284,9 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                     // since all the algorithms use upper case letters.  This way, the user can use either case and
                     // we'll still recognize it.
                     if (argParts.length < 2 || argParts[1] == null || argParts[1].trim().isEmpty()) {
-                        errors.add("Hash name not found");
+                        errors.add(Main.RESOURCES.getString("cli.error.hash.not.found"));
                     } else if (!ComparisonOptions.HASHES.contains(argParts[1].trim().toUpperCase())) {
-                        errors.add("Hash name not supported");
+                        errors.add(Main.RESOURCES.getString("cli.error.hash.not.supported"));
                     } else {
                         options.setHash(argParts[1].trim().toUpperCase());
                     }
@@ -294,7 +299,7 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                 case "log":
                     // This is pretty much the same as the source and target directories:
                     if (argParts.length < 2 || argParts[1] == null || argParts[1].trim().isEmpty()) {
-                        errors.add("Log path not found");
+                        errors.add(Main.RESOURCES.getString("cli.error.log.path.not.found"));
                     } else {
                         try {
                             String pathString = argParts[1].trim();
@@ -302,10 +307,10 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                             if (Files.exists(path) && Files.isDirectory(path)) {
                                 options.setLogFilePath(pathString);
                             } else {
-                                errors.add("Log path is not a valid directory");
+                                errors.add(Main.RESOURCES.getString("cli.error.log.path.not.valid"));
                             }
                         } catch (Exception ex) {
-                            errors.add("Log path is not a valid directory");
+                            errors.add(Main.RESOURCES.getString("cli.error.log.path.not.valid"));
                         }
                     }
                     break;
@@ -327,13 +332,13 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
         // errors for them.  We'll do this in reverse order of what's in the usage list, inserting them into the
         // beginning of the list.  The log file, the target path, and the source path  are all required.
         if (options.getLogFilePath() == null) {
-            errors.add(0, "Log file path not specified");
+            errors.add(0, Main.RESOURCES.getString("cli.error.log.path.not.specified"));
         }
         if (targetPath == null) {
-            errors.add(0, "Target path not specified");
+            errors.add(0, Main.RESOURCES.getString("cli.error.target.path.not.specified"));
         }
         if (sourcePath == null) {
-            errors.add(0,"Source path not specified");
+            errors.add(0,Main.RESOURCES.getString("cli.error.source.path.not.specified"));
         }
         // Don't let the user compare the same path to itself, or let the source path contain the target path or vice
         // versa:
@@ -342,7 +347,7 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                         Paths.get(sourcePath).startsWith(targetPath) ||
                         Paths.get(targetPath).startsWith(sourcePath)
                 )) {
-            errors.add("Portions of the source and target paths refer to the same path");
+            errors.add(Main.RESOURCES.getString("cli.error.source.target.same.path"));
 
         }
         // There's one last thing that needs to be checked.  If all three paths are set (source, target, and log), make
@@ -350,7 +355,7 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
         if (sourcePath != null && targetPath != null && options.getLogFilePath() != null && (
             Paths.get(options.getLogFilePath()).startsWith(sourcePath) ||
             Paths.get(options.getLogFilePath()).startsWith(targetPath))) {
-            errors.add("The log file cannot be written to either the source or target path");
+            errors.add(Main.RESOURCES.getString("cli.error.log.file.in.path"));
         }
         // Return the final error list:
         return errors;

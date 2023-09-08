@@ -3,6 +3,7 @@ package com.gpfcomics.deepcompare.gui;
 import com.gpfcomics.deepcompare.Main;
 import com.gpfcomics.deepcompare.core.ComparisonResult;
 import com.gpfcomics.deepcompare.core.DCDirectory;
+import com.gpfcomics.deepcompare.core.Utilities;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -10,6 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.lang.reflect.Method;
+import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 /**
@@ -26,6 +28,8 @@ public class ResultDialog extends JDialog {
     private JTree treeSource;
     private DefaultMutableTreeNode sourceTop;
     private JTree treeTarget;
+    private JLabel lblSourceFiles;
+    private JLabel lblTargetFiles;
     private DefaultMutableTreeNode targetTop;
 
     /**
@@ -48,6 +52,22 @@ public class ResultDialog extends JDialog {
         // For now, this dialog only gets shown if the comparison found discrepancies.  (If both folders match, a simple
         // message dialog is displayed.)  As such, the status label should note that discrepancies were found.
         lblResultStatus.setText(Main.RESOURCES.getString("result.discrepancies.found"));
+
+        // Populate the labels that show the number of files and total bytes for each directory:
+        lblSourceFiles.setText(
+                String.format(
+                        Main.RESOURCES.getString("result.files.and.bytes"),
+                        NumberFormat.getIntegerInstance().format(result.getSourceDirectory().getCount()),
+                        Utilities.prettyPrintFileSize(result.getSourceDirectory().getSize())
+                )
+        );
+        lblTargetFiles.setText(
+                String.format(
+                        Main.RESOURCES.getString("result.files.and.bytes"),
+                        NumberFormat.getIntegerInstance().format(result.getTargetDirectory().getCount()),
+                        Utilities.prettyPrintFileSize(result.getTargetDirectory().getSize())
+                )
+        );
 
         // Now build the two result trees, starting with the source tree.  The work is pretty much the same, so we'll
         // farm it out to a helper method.
@@ -180,6 +200,9 @@ public class ResultDialog extends JDialog {
         final JScrollPane scrollPane1 = new JScrollPane();
         panel3.add(scrollPane1, BorderLayout.CENTER);
         scrollPane1.setViewportView(treeSource);
+        lblSourceFiles = new JLabel();
+        lblSourceFiles.setText("Files and Bytes Here");
+        panel3.add(lblSourceFiles, BorderLayout.SOUTH);
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new BorderLayout(0, 0));
         panel2.add(panel4, BorderLayout.EAST);
@@ -189,6 +212,11 @@ public class ResultDialog extends JDialog {
         final JScrollPane scrollPane2 = new JScrollPane();
         panel4.add(scrollPane2, BorderLayout.CENTER);
         scrollPane2.setViewportView(treeTarget);
+        lblTargetFiles = new JLabel();
+        lblTargetFiles.setHorizontalAlignment(4);
+        lblTargetFiles.setHorizontalTextPosition(4);
+        lblTargetFiles.setText("Files and Bytes Here");
+        panel4.add(lblTargetFiles, BorderLayout.SOUTH);
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new BorderLayout(0, 0));
         contentPane.add(panel5, BorderLayout.SOUTH);

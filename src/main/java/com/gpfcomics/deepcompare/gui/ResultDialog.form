@@ -49,6 +49,12 @@
                       </component>
                     </children>
                   </scrollpane>
+                  <component id="337c7" class="javax.swing.JLabel" binding="lblSourceFiles">
+                    <constraints border-constraint="South"/>
+                    <properties>
+                      <text value="Files and Bytes Here"/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
               <grid id="ed59d" layout-manager="BorderLayout" hgap="0" vgap="0">
@@ -73,6 +79,14 @@
                       </component>
                     </children>
                   </scrollpane>
+                  <component id="2b42a" class="javax.swing.JLabel" binding="lblTargetFiles">
+                    <constraints border-constraint="South"/>
+                    <properties>
+                      <horizontalAlignment value="4"/>
+                      <horizontalTextPosition value="4"/>
+                      <text value="Files and Bytes Here"/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
             </children>
