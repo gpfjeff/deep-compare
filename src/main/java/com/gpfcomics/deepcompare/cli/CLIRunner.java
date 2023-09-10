@@ -129,46 +129,8 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
      * Print the usage text to the console.
      */
     private void printUsage() {
-        // TODO: How do we move this wall of text into the MessagesBundle?
-        System.out.println("USAGE:");
-                          // Assuming 80 characters output:
-                          //12345678901234567890123456789012345678901234567890123456789012345678901234567890
-        System.out.println("  --source=[source folder]");
-        System.out.println("       REQUIRED.  The path to the source folder.  If this path is not valid,");
-        System.out.println("       the program will immediately exit with an error.");
-        System.out.println("  --target=[target folder]");
-        System.out.println("       REQUIRED.  The path to the target folder.  If this path is not valid,");
-        System.out.println("       the program will immediately exit with an error.");
-        System.out.println("  --exclusions=[exclusion file path]");
-        System.out.println("       OPTIONAL.  The path to a text file containing a list of exclusions.");
-        System.out.println("       Any file matching the patterns in this file will be ignored by the");
-        System.out.println("       comparison engine.  Exclusions should be listed one per line and");
-        System.out.println("       will be executed in the order provided.  Lines beginning with a hash or");
-        System.out.println("       pound sign (\"#\") will be ignored.");
-        System.out.println("  --use-regex");
-        System.out.println("       OPTIONAL; only relevant if an exclusion file has been specified.  If");
-        System.out.println("       specified, exclusions in the file will be assumed to be regular");
-        System.out.println("       expressions.  Otherwise, exclusions will be assumed to be simple");
-        System.out.println("       DOS/UNIX file matching patterns (? for single character matches,");
-        System.out.println("       * for any character.)");
-        System.out.println("  --hash=[Java hash algorithm name]");
-        System.out.println("       OPTIONAL.  By default, the comparison will use the SHA-256 hash");
-        System.out.println("       algorithm if available, falling back to SHA-1 if it is not.");
-        System.out.println("       Alternatively, you can specify which hash to use by providing the");
-        System.out.println("       Java hash algorithm name.  If this name is not recognized, the");
-        System.out.println("       program will immediately exit with an error.  Check your JDK/JRE");
-        System.out.println("       documentation on which hash algorithms are available.");
-        System.out.println("  --hidden");
-        System.out.println("       OPTIONAL. By default, hidden files will be ignored.  If this flag is");
-        System.out.println("       specified, hidden files will also be searched for and compared.");
-        System.out.println("  --log=[log file directory]");
-        System.out.println("       REQUIRED for command-line mode.  A directory in which a log file will be");
-        System.out.println("       generated to contain the comparison results.  This directory should");
-        System.out.println("       already exist; if not, the program will immediately exit with an error.");
-        System.out.println("       This directory should not be either the source or target path.");
-        System.out.println("  --debug");
-        System.out.println("       OPTIONAL; If specified, debug-level output will be logged to the log");
-        System.out.println("       file.");
+        // The usage statement is one bit property in the resources files:
+        System.out.println(Main.RESOURCES.getString("cli.usage"));
         System.out.println();
     }
 
@@ -318,6 +280,17 @@ public class CLIRunner implements IHashProgressListener, IStatusListener {
                 case "debug":
                     options.setDebugMode(true);
                     break;
+                // Print a list of hash algorithms available to Deep Compare and exit:
+                case "show-hashes":
+                    System.out.println(Main.RESOURCES.getString("cli.available.hashes"));
+                    for (String hash : ComparisonOptions.HASHES) {
+                        System.out.println("\t" + hash);
+                    }
+                    System.exit(0);
+                // Print the usage message:
+                case "help":
+                    printUsage();
+                    System.exit(0);
                 // If we get anything else, tell the use we don't recognize the parameter:
                 default:
                     errors.add(
