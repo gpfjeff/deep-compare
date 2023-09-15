@@ -56,6 +56,7 @@ public class StartWindow {
         btnOptions.addActionListener(e -> {
             OptionsDialog dialog = new OptionsDialog(parent, options);
             dialog.pack();
+            dialog.setLocationRelativeTo(parent);
             dialog.setVisible(true);
         });
 
@@ -63,6 +64,7 @@ public class StartWindow {
         btnAbout.addActionListener(e -> {
             AboutDialog dialog = new AboutDialog(parent);
             dialog.pack();
+            dialog.setLocationRelativeTo(parent);
             dialog.setVisible(true);
         });
 
@@ -88,7 +90,7 @@ public class StartWindow {
                                 !Files.isDirectory(sourcePath)
                 ) {
                     JOptionPane.showMessageDialog(
-                            null,
+                            btnStart.getParent(),
                             Main.RESOURCES.getString("start.error.invalid.source.path"),
                             Main.RESOURCES.getString("dialog.title.error"),
                             JOptionPane.ERROR_MESSAGE
@@ -101,7 +103,7 @@ public class StartWindow {
                                 !Files.isDirectory(targetPath)
                 ) {
                     JOptionPane.showMessageDialog(
-                            null,
+                            btnStart.getParent(),
                             Main.RESOURCES.getString("start.error.invalid.target.path"),
                             Main.RESOURCES.getString("dialog.title.error"),
                             JOptionPane.ERROR_MESSAGE
@@ -113,7 +115,7 @@ public class StartWindow {
                         sourcePath.startsWith(targetString) ||
                         targetPath.startsWith(sourceString)) {
                     JOptionPane.showMessageDialog(
-                            null,
+                            btnStart.getParent(),
                             Main.RESOURCES.getString("start.error.source.target.same.path"),
                             Main.RESOURCES.getString("dialog.title.error"),
                             JOptionPane.ERROR_MESSAGE
@@ -127,7 +129,7 @@ public class StartWindow {
                         (Paths.get(options.getLogFilePath()).startsWith(sourceString) ||
                                 Paths.get(options.getLogFilePath()).startsWith(targetString))) {
                     JOptionPane.showMessageDialog(
-                            null,
+                            btnStart.getParent(),
                             Main.RESOURCES.getString("start.error.log.file.in.path"),
                             Main.RESOURCES.getString("dialog.title.error"),
                             JOptionPane.ERROR_MESSAGE
@@ -143,10 +145,11 @@ public class StartWindow {
                 // put it to work:
                 ProgressDialog dialog = new ProgressDialog(parent, sourceString, targetString, options);
                 dialog.pack();
+                dialog.setLocationRelativeTo(parent);
                 dialog.setVisible(true);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
-                        null,
+                        btnStart.getParent(),
                         Main.RESOURCES.getString("start.error.generic"),
                         Main.RESOURCES.getString("dialog.title.error"),
                         JOptionPane.ERROR_MESSAGE
@@ -196,13 +199,13 @@ public class StartWindow {
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             // If the user selects a valid path (which we'll assume the file chooser will validate), set the test field
             // to the absolute path of the selected directory:
-            if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            if (chooser.showOpenDialog(targetField.getParent()) == JFileChooser.APPROVE_OPTION) {
                 targetField.setText(chooser.getSelectedFile().getAbsolutePath());
             }
         } catch (Exception ex) {
             // TODO: Catch explicit exceptions to make more useful error messages
             JOptionPane.showMessageDialog(
-                    null,
+                    targetField.getParent(),
                     String.format(
                             Main.RESOURCES.getString("start.browse.generic.error"),
                             label

@@ -108,6 +108,7 @@ public class OptionsDialog extends JDialog {
             // Prompt the user for a new exclusion pattern.  Note that we're not going to do any validation here to see
             // if the pattern is valid.  The comparison engine will simply ignore the pattern if it doesn't parse.
             String newExclusion = JOptionPane.showInputDialog(
+                    btnAdd.getParent(),
                     Main.RESOURCES.getString("options.exclusions.dialog.prompt")
             );
             // If the string is non-empty:
@@ -221,12 +222,12 @@ public class OptionsDialog extends JDialog {
                 chooser.setDialogTitle(Main.RESOURCES.getString("options.log.directory.prompt"));
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 // If the user selects a directory, update the log path text box:
-                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                if (chooser.showOpenDialog(btnLogBrowse.getParent()) == JFileChooser.APPROVE_OPTION) {
                     txtLogPath.setText(chooser.getSelectedFile().getAbsolutePath());
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
-                        null,
+                        btnLogBrowse.getParent(),
                         Main.RESOURCES.getString("options.error.log.path.generic"),
                         Main.RESOURCES.getString("dialog.title.error"),
                         JOptionPane.ERROR_MESSAGE
@@ -266,7 +267,7 @@ public class OptionsDialog extends JDialog {
                 Path logPathPath = Paths.get(logPath);
                 if (!Files.exists(logPathPath) || !Files.isDirectory(logPathPath)) {
                     JOptionPane.showMessageDialog(
-                            null,
+                            btnOk.getParent(),
                             Main.RESOURCES.getString("options.error.log.path.invalid"),
                             Main.RESOURCES.getString("dialog.title.error"),
                             JOptionPane.ERROR_MESSAGE
@@ -275,7 +276,7 @@ public class OptionsDialog extends JDialog {
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(
-                        null,
+                        btnOk.getParent(),
                         Main.RESOURCES.getString("options.error.log.path.invalid"),
                         Main.RESOURCES.getString("dialog.title.error"),
                         JOptionPane.ERROR_MESSAGE
@@ -292,7 +293,7 @@ public class OptionsDialog extends JDialog {
                     Pattern.compile(exclusionListModel.getElementAt(i));
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(
-                            null,
+                            btnOk.getParent(),
                             String.format(
                                     Main.RESOURCES.getString("options.error.invalid.regex"),
                                     exclusionListModel.getElementAt(i)

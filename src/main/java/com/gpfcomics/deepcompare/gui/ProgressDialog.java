@@ -41,7 +41,6 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
     private long currentFileBytes = 0L;
 
     // The total number of files to be hashed
-    // TODO: Need to decide if this is needed.  Either add it to the UI or remove.
     private long totalFiles = 0L;
 
     // The workhorse for the GUI.  This subclass of SwingWorker runs the ComparisonEngine in a separate thread to keep
@@ -124,7 +123,7 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
     // they really want to cancel the job.  If they do, tell the worker to stop and close the dialog.
     private void onCancel() {
         int result = JOptionPane.showConfirmDialog(
-                this,
+                btnCancel.getParent(),
                 Main.RESOURCES.getString("progress.cancel.prompt"),
                 Main.RESOURCES.getString("progress.cancel.title"),
                 JOptionPane.YES_NO_OPTION,
@@ -201,7 +200,7 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
                 // scroll through.)
                 if (result.getSourceDirectory().isMatch() && result.getTargetDirectory().isMatch()) {
                     JOptionPane.showMessageDialog(
-                            this,
+                            btnCancel.getParent(),
                             Main.RESOURCES.getString("result.all.match"),
                             Main.RESOURCES.getString("result.dialog.title"),
                             JOptionPane.INFORMATION_MESSAGE
@@ -210,15 +209,16 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
                     // Looks like we've got to show our work.  Launch the result dialog to show what's different:
                     ResultDialog dialog = new ResultDialog(owner, result);
                     dialog.pack();
+                    dialog.setLocationRelativeTo(owner);
                     dialog.setVisible(true);
                 }
-                // TODO: Commenting this out for now.  This else block was being hit if the process was cancelled, which
-                //       for some reason returns DONE.  Naturally, the result is null in this case, which was showing this
-                //       error dialog.  Need to differentiate between done-done and cancelled-done.
+            // TODO: Commenting this out for now.  This else block was being hit if the process was cancelled, which
+            //       for some reason returns DONE.  Naturally, the result is null in this case, which was showing this
+            //       error dialog.  Need to differentiate between done-done and cancelled-done.
             /*} else {
                 // This *SHOULDN'T* happen, but if it does, show an error box if the result is null:
                 JOptionPane.showMessageDialog(
-                        this,
+                        btnCancel.getParent(),
                         Main.RESOURCES.getString("progress.error.message"),
                         Main.RESOURCES.getString("dialog.title.error"),
                         JOptionPane.ERROR_MESSAGE

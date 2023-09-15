@@ -16,8 +16,22 @@
       <name>Jeffrey T. Darlington</name>
       <email>jeff@gpf-comics.com</email>
       <url>https://www.jeffdarlington.com/</url>
+      <organization>GPF Comics</organization>
+      <organizationUrl>https://www.gpf-comics.com/</organizationUrl>
+      <roles><role>High Grand Poobah</role></roles>
+      <timezone>America/New_York</timezone>
     </developer>
   </developers>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/gpfjeff/deep-compare/issues</url>
+  </issueManagement>
+
+  <scm>
+    <connection>scm:git:https://github.com/gpfjeff/deep-compare.git</connection>
+    <url>https://github.com/gpfjeff/deep-compare.git</url>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,6 +49,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
