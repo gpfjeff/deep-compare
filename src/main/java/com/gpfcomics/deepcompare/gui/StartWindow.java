@@ -52,6 +52,10 @@ public class StartWindow {
             browseForPath(Main.RESOURCES.getString("target.label"), txtTarget);
         });
 
+        // Add drag-and-drop support to the source and target text fields:
+        txtSource.setTransferHandler(new FileDropHandler());
+        txtTarget.setTransferHandler(new FileDropHandler());
+
         // The Comparison Options button launches the options dialog, which lets the user fine tune the comparison:
         btnOptions.addActionListener(e -> {
             OptionsDialog dialog = new OptionsDialog(parent, options);

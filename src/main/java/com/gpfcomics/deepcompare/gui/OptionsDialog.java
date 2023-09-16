@@ -235,6 +235,9 @@ public class OptionsDialog extends JDialog {
             }
         });
 
+        // Allow the user to drop a directory on the log path field:
+        txtLogPath.setTransferHandler(new FileDropHandler());
+
         // Set the debug checkbox:
         checkDebug.setSelected(this.options.isDebugMode());
 
