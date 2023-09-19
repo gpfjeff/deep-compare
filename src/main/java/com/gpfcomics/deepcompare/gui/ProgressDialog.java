@@ -183,8 +183,10 @@ public class ProgressDialog extends JDialog implements IStatusListener, IHashPro
         );
         // Update the progress bar.  To avoid flicker, we'll only update the display if the percentage has changed from
         // the previous value.
-        if (percent != progressBar.getValue())
+        if (percent != progressBar.getValue()) {
             progressBar.setValue(percent);
+            progressBar.setToolTipText(percent + "%");
+        }
     }
 
     @Override

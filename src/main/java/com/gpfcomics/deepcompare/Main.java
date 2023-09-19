@@ -40,8 +40,7 @@ public class Main {
     static {
         ResourceBundle temp;
         try {
-            Locale locale = Locale.getDefault();
-            temp = ResourceBundle.getBundle("MessagesBundle", locale);
+            temp = ResourceBundle.getBundle("MessagesBundle", Locale.getDefault());
         } catch (Exception ignored) {
             temp = ResourceBundle.getBundle("MessagesBundle", Locale.US);
         }

@@ -64,6 +64,15 @@ public class DCDirectory {
     @Getter
     private long count = 0;
 
+    /**
+     * Should our exclusion patterns be case-insensitive?  This is largely based on the operating system we are running
+     * on.  Since this test only needs ot occur once, we'll do it as a private, static constant.
+     */
+    private static final boolean CASE_INSENSITIVE =
+            // For now, only Windows and MacOS are case-insensitive; all others are case-sensitive:
+            System.getProperty("os.name").startsWith("Windows") ||
+            System.getProperty("os.name").startsWith("Mac");
+
     /* CONSTRUCTORS **************************************************************************************************/
 
     /**
@@ -105,17 +114,14 @@ public class DCDirectory {
                             // then check each exclusion in the list and see it's a match.  If it matches, flag the
                             // file so we'll skip it.  Note that if the pattern is invalid and won't compile, we'll
                             // silently skip the pattern and assume it's not a match.  Also note that if we're running
-                            // on some flavor of Windows or MacOS, we'll treat the regex as case-insensitive; otherwise,
-                            // we'll assume it's case-sensitive.
+                            // on an operating system where files names are not case-sensitive, we'll treat the regex as
+                            // case-insensitive; otherwise, we'll assume it's case-sensitive.
                             boolean addToList = true;
                             String simpleName = f.getFileName().toString();
-                            boolean caseInsensitive =
-                                    System.getProperty("os.name").startsWith("Windows") ||
-                                    System.getProperty("os.name").startsWith("Mac");
                             for (String exclusion : options.getExclusions()) {
                                 try {
                                     Pattern regex;
-                                    if (caseInsensitive)
+                                    if (CASE_INSENSITIVE)
                                         regex = Pattern.compile(exclusion, Pattern.CASE_INSENSITIVE);
                                     else
                                         regex = Pattern.compile(exclusion);

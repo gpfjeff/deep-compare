@@ -72,7 +72,7 @@ public class ResultDialog extends JDialog {
         // Now build the two result trees, starting with the source tree.  The work is pretty much the same, so we'll
         // farm it out to a helper method.
         // TODO: Do we need to put the tree building portion in a separate thread to keep things responsive?  This
-        //       could happen if there are a huge number of file to work through.
+        //       could happen if there are a huge number of files to work through.
         buildResultTree(
                 true,
                 result.getSourceDirectory(),

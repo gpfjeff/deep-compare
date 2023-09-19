@@ -44,13 +44,8 @@ public class StartWindow {
     public StartWindow(JFrame parent) {
 
         // The source and target Browse buttons will allow the user to select these folders graphically:
-        btnSourceBrowse.addActionListener(e -> {
-            browseForPath(Main.RESOURCES.getString("source.label"), txtSource);
-        });
-
-        btnTargetBrowse.addActionListener(e -> {
-            browseForPath(Main.RESOURCES.getString("target.label"), txtTarget);
-        });
+        btnSourceBrowse.addActionListener(e -> browseForPath(Main.RESOURCES.getString("source.label"), txtSource));
+        btnTargetBrowse.addActionListener(e -> browseForPath(Main.RESOURCES.getString("target.label"), txtTarget));
 
         // Add drag-and-drop support to the source and target text fields:
         txtSource.setTransferHandler(new FileDropHandler());
@@ -73,9 +68,7 @@ public class StartWindow {
         });
 
         // The Close button (wait for it...) closes the window:
-        btnClose.addActionListener(e -> {
-            System.exit(0);
-        });
+        btnClose.addActionListener(e -> System.exit(0));
 
         // Where the rubber meets the road.  The Start button validates our inputs and launches the comparison engine
         // to perform the actual comparison.
