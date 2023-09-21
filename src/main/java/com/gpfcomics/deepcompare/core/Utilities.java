@@ -1,3 +1,9 @@
+/*
+ * DEEP COMPARE: Utilities
+ * AUTHOR: Jeffrey T. Darlington
+ * URL: https://github.com/gpfjeff/deep-compare
+ * Copyright 2023, Jeffrey T. Darlington.  All rights reserved.
+ */
 package com.gpfcomics.deepcompare.core;
 
 import javax.swing.filechooser.FileSystemView;

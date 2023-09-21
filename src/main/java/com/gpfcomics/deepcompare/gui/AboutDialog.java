@@ -1,3 +1,9 @@
+/*
+ * DEEP COMPARE: AboutDialog
+ * AUTHOR: Jeffrey T. Darlington
+ * URL: https://github.com/gpfjeff/deep-compare
+ * Copyright 2023, Jeffrey T. Darlington.  All rights reserved.
+ */
 package com.gpfcomics.deepcompare.gui;
 
 import com.gpfcomics.deepcompare.Main;
@@ -10,6 +16,9 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ResourceBundle;
 
+/**
+ * The About dialog for Deep Compare, which displays the version number, copyright year, and attributions
+ */
 public class AboutDialog extends JDialog {
 
     // GUI elements, mostly added automagically by the GUI builder.  The translator attribution label will be sourced

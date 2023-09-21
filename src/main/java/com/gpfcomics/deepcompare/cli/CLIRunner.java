@@ -1,3 +1,9 @@
+/*
+ * DEEP COMPARE: CLIRunner
+ * AUTHOR: Jeffrey T. Darlington
+ * URL: https://github.com/gpfjeff/deep-compare
+ * Copyright 2023, Jeffrey T. Darlington.  All rights reserved.
+ */
 package com.gpfcomics.deepcompare.cli;
 
 import com.gpfcomics.deepcompare.Main;
@@ -13,6 +19,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+/**
+ * The Command-Line Interface "Runner" for Deep Compare.  This class implements the user interface for the application's
+ * CLI mode, and is responsible for parsing command-line inputs, executing the ComparisonEngine, and reporting a summary
+ * of the results to the screen.  Detailed results will be written to the mandatory log file.
+ */
 public class CLIRunner implements IHashProgressListener, IStatusListener {
 
     // The command line arguments, passed in from the Main class:

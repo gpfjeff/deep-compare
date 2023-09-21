@@ -1,3 +1,9 @@
+/*
+ * DEEP COMPARE: ComparisonWorker
+ * AUTHOR: Jeffrey T. Darlington
+ * URL: https://github.com/gpfjeff/deep-compare
+ * Copyright 2023, Jeffrey T. Darlington.  All rights reserved.
+ */
 package com.gpfcomics.deepcompare.gui;
 
 import com.gpfcomics.deepcompare.Main;
@@ -9,9 +15,12 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 /**
- * This subclass of SwingWorker wraps the ComparisonEngine to make it compatible with the Swing UI.
+ * This subclass of SwingWorker wraps the ComparisonEngine to make it compatible with the Swing UI.  The return value
+ * for the background thread is a ComparisonResult, which holds the results of the directory scan and comparison.  Since
+ * the ComparisonEngine already uses two listener interfaces, the "progress" object of SwingWorker is not used.  The
+ * caller should implement these interfaces instead.
  */
-public class ComparisonWorker extends SwingWorker<ComparisonResult, ComparisonStatus> {
+public class ComparisonWorker extends SwingWorker<ComparisonResult, Object> {
 
     // Our parent ProgressDialog.  Primarily used to be the owner of any message dialogs we might pop.
     private final ProgressDialog parent;

@@ -1,3 +1,9 @@
+/*
+ * DEEP COMPARE: FileDropHandler
+ * AUTHOR: Jeffrey T. Darlington
+ * URL: https://github.com/gpfjeff/deep-compare
+ * Copyright 2023, Jeffrey T. Darlington.  All rights reserved.
+ */
 package com.gpfcomics.deepcompare.gui;
 
 import com.gpfcomics.deepcompare.Main;
@@ -10,8 +16,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * A TransferHandler subclass for allowing directories to be dropped on text boxes.  This should not be added to
- * any Components besides JTextFields.
+ * A TransferHandler subclass for allowing directories to be dropped on text boxes.  Doing so will copy the folder's
+ * absolute path into the text box.  This handler should not be added to any Swing Components besides JTextFields.
  */
 public class FileDropHandler extends TransferHandler {
 
@@ -52,8 +58,13 @@ public class FileDropHandler extends TransferHandler {
             return false;
         }
 
-        // Get the text field we're dropping on.  We will only ever use this on the "Browse" text fields, but I'm
-        // not sure how to really enforce this.
+        // Make sure the component we are attached to is a JTextField and throw a RuntimeException if this isn't the
+        // case.  This *SHOULDN'T* happen, but since we're relying on this detail, might as well check for it.
+        if (!(support.getComponent() instanceof JTextField)) {
+            throw new RuntimeException("FileDropHandler is attached to a Component that is not a JTextField");
+        }
+
+        // Now that it's safe to do so, get a reference to the text field we're dropping on:
         JTextField field = (JTextField)support.getComponent();
 
         try {
@@ -84,6 +95,7 @@ public class FileDropHandler extends TransferHandler {
             );
         }
         return false;
+
     }
 
 }

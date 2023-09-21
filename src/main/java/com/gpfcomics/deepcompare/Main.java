@@ -1,3 +1,9 @@
+/*
+ * DEEP COMPARE: Main
+ * AUTHOR: Jeffrey T. Darlington
+ * URL: https://github.com/gpfjeff/deep-compare
+ * Copyright 2023, Jeffrey T. Darlington.  All rights reserved.
+ */
 package com.gpfcomics.deepcompare;
 
 import com.gpfcomics.deepcompare.cli.CLIRunner;
@@ -10,7 +16,8 @@ import java.util.ResourceBundle;
 
 /**
  * Main application starting point.  This class controls whether we start in GUI or CLI mode, based on how the main
- * method is called.  It also hosts application-wide constants, such as version and copyright information.
+ * method is called.  It also hosts application-wide constants, such as version and copyright information and the main
+ * resource bundle.
  */
 public class Main {
 

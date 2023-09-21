@@ -1,5 +1,15 @@
+/*
+ * DEEP COMPARE: IHashProgressListener
+ * AUTHOR: Jeffrey T. Darlington
+ * URL: https://github.com/gpfjeff/deep-compare
+ * Copyright 2023, Jeffrey T. Darlington.  All rights reserved.
+ */
 package com.gpfcomics.deepcompare.core;
 
+/**
+ * Classes that wish to be notified of the progress the Deep Compare's file hashing step should implement this interface
+ * and register themselves with the ComparisonEngine.
+ */
 public interface IHashProgressListener {
 
     /**
