@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.gpfcomics.deepcompare.gui.ProgressDialog">
+  <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="48" y="54" width="436" height="297"/>
+    </constraints>
+    <properties/>
+    <border type="empty">
+      <size top="5" left="5" bottom="5" right="5"/>
+    </border>
+    <children>
+      <grid id="e3588" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="empty">
+          <size top="5" left="5" bottom="5" right="5"/>
+        </border>
+        <children>
+          <component id="1972b" class="javax.swing.JLabel" binding="lblStatus">
+            <constraints border-constraint="North"/>
+            <properties>
+              <text value="Status info goes here..."/>
+            </properties>
+          </component>
+          <component id="1a8b" class="javax.swing.JProgressBar" binding="progressBar">
+            <constraints border-constraint="Center"/>
+            <properties/>
+          </component>
+          <component id="5be2" class="javax.swing.JLabel" binding="lblFilesAndBytes">
+            <constraints border-constraint="South"/>
+            <properties>
+              <text resource-bundle="MessagesBundle" key="progress.files.label.wait"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="94766" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="9538f" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="5723f" class="javax.swing.JButton" binding="btnCancel">
+                <constraints/>
+                <properties>
+                  <text resource-bundle="MessagesBundle" key="cancel.button"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

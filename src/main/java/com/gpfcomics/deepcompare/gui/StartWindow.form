@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.gpfcomics.deepcompare.gui.StartWindow">
+  <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="empty">
+      <size top="5" left="5" bottom="5" right="5"/>
+    </border>
+    <children>
+      <grid id="56636" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="empty">
+          <size top="0" left="5" bottom="5" right="5"/>
+        </border>
+        <children>
+          <component id="8e643" class="javax.swing.JButton" binding="btnStart">
+            <constraints/>
+            <properties>
+              <text resource-bundle="MessagesBundle" key="start.start.button"/>
+            </properties>
+          </component>
+          <component id="45cd7" class="javax.swing.JButton" binding="btnAbout">
+            <constraints/>
+            <properties>
+              <text resource-bundle="MessagesBundle" key="start.about.button"/>
+            </properties>
+          </component>
+          <component id="815ef" class="javax.swing.JButton" binding="btnClose">
+            <constraints/>
+            <properties>
+              <text resource-bundle="MessagesBundle" key="start.close.button"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="54716" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="empty">
+          <size top="5" left="5" bottom="5" right="5"/>
+        </border>
+        <children>
+          <grid id="e5cbf" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="South"/>
+            <properties/>
+            <border type="empty">
+              <size top="5" left="0" bottom="0" right="0"/>
+            </border>
+            <children>
+              <grid id="8ea84" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                <constraints border-constraint="Center"/>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="db5c1" class="javax.swing.JButton" binding="btnOptions">
+                    <constraints/>
+                    <properties>
+                      <text resource-bundle="MessagesBundle" key="start.comparison.options.button"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+          <grid id="13b24" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="cd39f" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="South"/>
+                <properties/>
+                <border type="empty">
+                  <size top="5" left="0" bottom="0" right="0"/>
+                </border>
+                <children>
+                  <component id="855c8" class="javax.swing.JButton" binding="btnTargetBrowse">
+                    <constraints border-constraint="East"/>
+                    <properties>
+                      <label resource-bundle="MessagesBundle" key="browse.button"/>
+                      <text value="Browse..."/>
+                    </properties>
+                  </component>
+                  <component id="aca54" class="javax.swing.JTextField" binding="txtTarget">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                  </component>
+                </children>
+              </grid>
+              <grid id="106e9" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="Center"/>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <grid id="72abc" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints border-constraint="South"/>
+                    <properties/>
+                    <border type="empty">
+                      <size top="5" left="0" bottom="0" right="0"/>
+                    </border>
+                    <children>
+                      <component id="cce73" class="javax.swing.JLabel">
+                        <constraints border-constraint="West"/>
+                        <properties>
+                          <text resource-bundle="MessagesBundle" key="start.target.folder"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="7f572" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <grid id="b227f" layout-manager="BorderLayout" hgap="0" vgap="0">
+                        <constraints border-constraint="South"/>
+                        <properties/>
+                        <border type="empty">
+                          <size top="5" left="0" bottom="0" right="0"/>
+                        </border>
+                        <children>
+                          <component id="f6746" class="javax.swing.JButton" binding="btnSourceBrowse">
+                            <constraints border-constraint="East"/>
+                            <properties>
+                              <label resource-bundle="MessagesBundle" key="browse.button"/>
+                              <text value="Browse..."/>
+                            </properties>
+                          </component>
+                          <component id="8742e" class="javax.swing.JTextField" binding="txtSource">
+                            <constraints border-constraint="Center"/>
+                            <properties/>
+                          </component>
+                        </children>
+                      </grid>
+                      <grid id="ec149" layout-manager="BorderLayout" hgap="0" vgap="0">
+                        <constraints border-constraint="Center"/>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <grid id="56a33" layout-manager="BorderLayout" hgap="0" vgap="0">
+                            <constraints border-constraint="South"/>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="ce6f6" class="javax.swing.JLabel">
+                                <constraints border-constraint="South"/>
+                                <properties>
+                                  <text resource-bundle="MessagesBundle" key="start.source.folder"/>
+                                </properties>
+                              </component>
+                            </children>
+                          </grid>
+                        </children>
+                      </grid>
+                    </children>
+                  </grid>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

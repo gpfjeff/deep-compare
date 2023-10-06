@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.gpfcomics.deepcompare.gui.ResultDialog">
+  <grid id="cbd77" binding="contentPane" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="48" y="54" width="436" height="297"/>
+    </constraints>
+    <properties/>
+    <border type="empty">
+      <size top="5" left="5" bottom="5" right="5"/>
+    </border>
+    <children>
+      <grid id="e3588" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="58c31" class="javax.swing.JLabel" binding="lblResultStatus">
+            <constraints border-constraint="North"/>
+            <properties>
+              <text value="Result status goes here..."/>
+            </properties>
+          </component>
+          <grid id="8355c" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="empty">
+              <size top="5" left="0" bottom="0" right="0"/>
+            </border>
+            <children>
+              <grid id="e1b8e" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="West"/>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="952a8" class="javax.swing.JLabel" binding="lblSource">
+                    <constraints border-constraint="North"/>
+                    <properties>
+                      <text resource-bundle="MessagesBundle" key="source.label"/>
+                    </properties>
+                  </component>
+                  <scrollpane id="a1871">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="4051f" class="javax.swing.JTree" binding="treeSource" custom-create="true">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
+                  <component id="337c7" class="javax.swing.JLabel" binding="lblSourceFiles">
+                    <constraints border-constraint="South"/>
+                    <properties>
+                      <text value="Files and Bytes Here"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="ed59d" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="East"/>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="6dc91" class="javax.swing.JLabel" binding="lblTarget">
+                    <constraints border-constraint="North"/>
+                    <properties>
+                      <text resource-bundle="MessagesBundle" key="target.label"/>
+                    </properties>
+                  </component>
+                  <scrollpane id="1e928">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="d0fc" class="javax.swing.JTree" binding="treeTarget" custom-create="true">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
+                  <component id="2b42a" class="javax.swing.JLabel" binding="lblTargetFiles">
+                    <constraints border-constraint="South"/>
+                    <properties>
+                      <horizontalAlignment value="4"/>
+                      <horizontalTextPosition value="4"/>
+                      <text value="Files and Bytes Here"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="94766" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="empty">
+          <size top="5" left="5" bottom="5" right="5"/>
+        </border>
+        <children>
+          <grid id="9538f" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="e7465" class="javax.swing.JButton" binding="buttonOK">
+                <constraints/>
+                <properties>
+                  <text value="OK"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
