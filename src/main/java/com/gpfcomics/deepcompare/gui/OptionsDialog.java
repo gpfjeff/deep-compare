@@ -441,8 +441,10 @@ public class OptionsDialog extends JDialog {
         btnAdd = new JButton();
         this.$$$loadButtonText$$$(btnAdd, this.$$$getMessageFromBundle$$$("MessagesBundle", "options.add.button"));
         panel13.add(btnAdd, BorderLayout.NORTH);
+        final JScrollPane scrollPane1 = new JScrollPane();
+        panel10.add(scrollPane1, BorderLayout.CENTER);
         listExclusions = new JList();
-        panel10.add(listExclusions, BorderLayout.CENTER);
+        scrollPane1.setViewportView(listExclusions);
         final JPanel panel14 = new JPanel();
         panel14.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         contentPane.add(panel14, BorderLayout.SOUTH);
