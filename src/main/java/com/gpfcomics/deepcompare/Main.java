@@ -25,7 +25,7 @@ public class Main {
      * The current version string, which will be displayed in various output modes.  This should be incremented for
      * each new release.
      */
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.0.1";
 
     /**
      * The current copyright year.  For now, this is just hard-coded to the year of our current release.  I suppose we

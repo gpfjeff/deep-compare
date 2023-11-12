@@ -180,10 +180,17 @@
                                           </grid>
                                         </children>
                                       </grid>
-                                      <component id="ac540" class="javax.swing.JList" binding="listExclusions">
+                                      <scrollpane id="8f7c4">
                                         <constraints border-constraint="Center"/>
                                         <properties/>
-                                      </component>
+                                        <border type="none"/>
+                                        <children>
+                                          <component id="ac540" class="javax.swing.JList" binding="listExclusions">
+                                            <constraints/>
+                                            <properties/>
+                                          </component>
+                                        </children>
+                                      </scrollpane>
                                     </children>
                                   </grid>
                                 </children>
